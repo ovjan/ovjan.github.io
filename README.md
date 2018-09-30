@@ -7,4 +7,4 @@
 
 [Урок 13](https://ovjan.github.io/lesson_13/ "Моя домашка") - Верстка pixel perfect
 
-[Урок 14](https://ovjan.github.io/lesson_14/ "Моя домашка") - Верстка шапки лендинга
+[Урок Практика часть 1](https://ovjan.github.io/lesson_14/ "Моя домашка") - Верстка шапки лендинга
