@@ -1,0 +1,182 @@
+/*Fonts family*/
+@font-face {
+    font-family: 'ProximaNova_bold';
+    src: url('../fonts/ProximaNova-Bold.eot');
+    src: url('../fonts/ProximaNova-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/ProximaNova-Bold.woff2') format('woff2'),
+        url('../fonts/ProximaNova-Bold.woff') format('woff'),
+        url('../fonts/ProximaNova-Bold.ttf') format('truetype'),
+        url('../fonts/ProximaNova-Bold.svg#ProximaNova-Bold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ProximaNova_reg';
+    src: url('../fonts/ProximaNova-Regular.eot');
+    src: url('../fonts/ProximaNova-Regular.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/ProximaNova-Regular.woff2') format('woff2'),
+        url('../fonts/ProximaNova-Regular.woff') format('woff'),
+        url('../fonts/ProximaNova-Regular.ttf') format('truetype'),
+        url('../fonts/ProximaNova-Regular.svg#ProximaNova-Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;	
+}
+.reg() {
+	font-family: 'ProximaNova_reg', sans-serif;
+}
+.bold() {
+	font-family: 'ProximaNova_bold', sans-serif;
+}
+
+/*Colors*/
+@btn-color: #fbb202;
+@icon-color: #44b413;
+@text-color: #1a1820;
+@danger-color: #ff0000;
+@bg-ligth: #f5f5f5;
+@ligth: #fff;
+@border-input: #dddddd;
+
+/*basic setting*/
+html {
+	font-size: 10px;
+}
+
+body {
+	.reg();
+}
+
+.button {
+	padding: 1rem 3rem;
+	border-radius: 8px;
+	font-size: 1.2rem;
+	background-color: @btn-color;
+	color: @ligth;
+	text-transform: uppercase;
+	border: none;
+}
+
+/*Typography*/
+section {
+	padding: 10rem 0;
+}
+
+/*main*/
+.main {
+	padding: 2rem 0;
+	background: #fff url(../img/main_bg.jpg) center center no-repeat;
+	&-content {
+		margin-top: 10rem;
+/*Главный заголовок*/
+		h1 {
+			margin-bottom: 4rem;
+			.bold();
+			font-size: 4rem;
+			line-height: 1.45;
+			text-transform: uppercase;
+		}
+	}
+/*Подзаголовок*/
+	&-subtitle {
+		margin-bottom: 4rem;
+		.reg();
+		font-size: 2.4rem;
+	}
+/*Зеленый ярлык*/
+	span {
+		display: inline-block;
+		padding: 3rem 5rem;
+		background-color: @icon-color;
+		font-size: 1.8rem;
+		color: @ligth;
+		text-align: center;
+		margin-bottom: 3rem;
+		strong {
+			font-size: 3rem;
+			.bold();
+		}
+	}
+/*Оплата по факту*/
+	&-trigger {
+		.bold();
+		font-size: 2.2rem;
+		text-transform: uppercase;
+		display: block;
+	}
+/*Главная форма*/
+	&-form {
+		padding: 4rem 5rem;
+		text-align: center;
+		background-color: @ligth;
+/*Заголовок формы*/
+		&-header {
+			font-size: 1.7rem;
+			margin-bottom: 4rem;
+			strong {
+				font-size: 1.8rem;
+			}
+		}
+		/*Поле ввода*/
+		&-input {
+			margin: 2rem 0;
+			display: block;
+			width: 100%;
+			text-align: center;
+			font-size: 1.7rem;
+			border: 1px solid @border-input;
+			padding: 0.8rem;
+		}
+		/*Подписи к полям*/
+		label {
+			position: absolute;
+			left: 50%;
+			transform: translateX(-50%) translateY(-50%);
+			padding: 0.5rem;
+			background-color: @ligth;
+			font-size: 1.3rem;
+		}
+		/*Кнопка */
+		&-btn {
+			display: block;
+			height: 5rem;
+			width: 100%;
+			font-size: 1.6rem;
+		}
+		/*Подпись под кнопкой*/
+		small {
+			display: block;
+			margin-top: 1.5rem;
+			font-size: 1.2rem;
+		}
+
+	}
+}
+.wrap {
+	display: table;
+	width: 100%;
+	height: 7rem;
+&-block {
+		display: table-cell;
+		text-align: right;
+		vertical-align: middle;
+	}
+}
+.header {
+	height: 7rem;
+}
+.phone {
+	&-block {
+		text-align: right;
+	}
+	&-link {
+	display: inline-block;
+	.bold();
+	font-size: 1.8rem;
+	height: 7rem;
+	line-height: 7rem;
+	color: @text-color;
+}
+}
+
+
