@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Калькулятор стяжки пола</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, 'SF Pro Display', 'Segoe UI', Arial, sans-serif;
+    background: #f4f4f6;
+    color: #1a1a2e;
+  }
+  .calc-wrap { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  .calc-header {
+    background: linear-gradient(135deg, #c0001a 0%, #e8002a 100%);
+    border-radius: 20px 20px 0 0;
+    padding: 28px 28px 24px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .calc-header::before {
+    content: ''; position: absolute; right: -30px; top: -30px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+  }
+  .calc-header h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; position: relative; }
+  .calc-header p { font-size: 14px; opacity: 0.85; position: relative; }
+
+  .calc-body {
+    background: #fff;
+    border-radius: 0 0 20px 20px;
+    padding: 28px 24px 32px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+  }
+
+  .section-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #c0001a;
+    margin-bottom: 14px; margin-top: 28px;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  .row { display: grid; gap: 14px; margin-bottom: 14px; }
+  .row.col2 { grid-template-columns: 1fr 1fr; }
+  .row.col3 { grid-template-columns: 1fr 1fr 1fr; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 13px; font-weight: 600; color: #555; }
+
+  .field input[type="number"] {
+    padding: 13px 14px; border: 1.5px solid #e5e5e5; border-radius: 12px;
+    font-size: 16px; color: #1a1a2e; background: #fafafa;
+    outline: none; transition: border-color 0.2s; width: 100%;
+    -webkit-appearance: none;
+  }
+  .field input[type="number"]:focus { border-color: #c0001a; background: #fff; }
+
+  .area-badge {
+    padding: 13px 14px; background: #fff0f2; border: 1.5px solid #f5c0c8;
+    border-radius: 12px; font-size: 16px; font-weight: 700; color: #c0001a;
+    min-height: 50px; display: flex; align-items: center;
+  }
+  .hint { font-size: 11px; color: #bbb; margin-top: 4px; line-height: 1.4; }
+
+  .slider-wrap { display: flex; align-items: center; gap: 12px; }
+  .slider-wrap input[type="range"] {
+    flex: 1; -webkit-appearance: none; height: 6px;
+    border-radius: 4px; background: #e5e5e5; outline: none; cursor: pointer;
+  }
+  .slider-wrap input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 28px; height: 28px;
+    border-radius: 50%; background: #c0001a; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(192,0,26,0.35);
+  }
+  .slider-val {
+    min-width: 68px; padding: 8px 10px; background: #fff0f2;
+    border: 1.5px solid #c0001a; border-radius: 10px;
+    font-size: 15px; font-weight: 700; color: #c0001a;
+    text-align: center; flex-shrink: 0;
+  }
+
+  .toggle-group { display: flex; border-radius: 12px; overflow: hidden; border: 1.5px solid #e5e5e5; }
+  .toggle-btn {
+    flex: 1; padding: 13px 12px; font-size: 14px; font-weight: 600;
+    text-align: center; cursor: pointer; color: #888; background: #fafafa;
+    transition: all 0.2s; border-right: 1px solid #e5e5e5;
+    user-select: none; -webkit-user-select: none;
+  }
+  .toggle-btn:last-child { border-right: none; }
+  .toggle-btn.active { background: #c0001a; color: #fff; }
+
+  .checkbox-field {
+    display: flex; align-items: center; gap: 14px; cursor: pointer;
+    padding: 15px 16px; border: 1.5px solid #e5e5e5; border-radius: 12px;
+    background: #fafafa; transition: all 0.2s;
+    user-select: none; -webkit-user-select: none; touch-action: manipulation;
+  }
+  .checkbox-field:hover { border-color: #c0001a; }
+  .checkbox-field.checked { border-color: #c0001a; background: #fff0f2; }
+  .checkbox-box {
+    width: 24px; height: 24px; flex-shrink: 0;
+    border: 2px solid #ccc; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .checkbox-field.checked .checkbox-box { background: #c0001a; border-color: #c0001a; }
+  .checkbox-box svg { display: none; }
+  .checkbox-field.checked .checkbox-box svg { display: block; }
+  .cb-text { font-size: 14px; font-weight: 600; color: #555; line-height: 1.3; }
+  .checkbox-field.checked .cb-text { color: #c0001a; }
+
+  /* Service selector */
+  .svc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .svc-btn {
+    padding: 16px 12px; border: 1.5px solid #e5e5e5; border-radius: 14px;
+    background: #fafafa; cursor: pointer; text-align: center;
+    transition: all 0.2s; user-select: none; -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  .svc-btn:active { transform: scale(0.97); }
+  .svc-btn.active { border-color: #c0001a; background: #fff0f2; }
+  .svc-icon { font-size: 26px; margin-bottom: 6px; line-height: 1; }
+  .svc-name { font-size: 13px; font-weight: 700; color: #555; line-height: 1.3; }
+  .svc-btn.active .svc-name { color: #c0001a; }
+
+  .calc-btn {
+    width: 100%; padding: 17px;
+    background: linear-gradient(135deg, #c0001a, #e8002a);
+    color: #fff; font-size: 17px; font-weight: 700;
+    border: none; border-radius: 14px; cursor: pointer;
+    margin-top: 24px; letter-spacing: 0.02em;
+    touch-action: manipulation; -webkit-appearance: none;
+  }
+  .calc-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+  .results { display: none; margin-top: 32px; }
+  .results.visible { display: block; }
+  .results-block { margin-bottom: 28px; }
+  .results-block-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+
+  .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .r-card { border: 1.5px solid #eee; border-radius: 14px; padding: 14px 15px; background: #fafafa; }
+  .r-card.hl { border-color: #c0001a; background: #fff0f2; }
+  .r-card .rc-label { font-size: 10px; color: #aaa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .r-card .rc-val { font-size: 22px; font-weight: 800; color: #1a1a2e; line-height: 1; }
+  .r-card.hl .rc-val { color: #c0001a; }
+  .r-card .rc-unit { font-size: 12px; color: #999; margin-top: 3px; }
+  .r-card .rc-sub { font-size: 10px; color: #bbb; margin-top: 7px; padding-top: 7px; border-top: 1px solid #eee; line-height: 1.3; }
+
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 14px; }
+  .price-table { width: 100%; border-collapse: collapse; border-radius: 14px; overflow: hidden; border: 1.5px solid #eee; font-size: 13px; table-layout: fixed; }
+  .price-table colgroup col:first-child { width: auto; }
+  .price-table colgroup col.col-qty { width: 68px; }
+  .price-table colgroup col.col-unit { width: 48px; }
+  .price-table colgroup col.col-price { width: 90px; }
+  .price-table colgroup col.col-sum { width: 100px; }
+  .price-table thead th { background: #f7f7f7; padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1.5px solid #eee; white-space: nowrap; }
+  .price-table thead th:not(:first-child) { text-align: right; }
+  .price-table tbody tr { border-bottom: 1px solid #f3f3f3; }
+  .price-table tbody tr:last-child { border-bottom: none; }
+  .price-table tbody td { padding: 12px 14px; color: #333; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .price-table tbody td:first-child { white-space: normal; }
+  .price-table tbody td:not(:first-child) { text-align: right; white-space: nowrap; }
+  .price-table tbody td:last-child { font-weight: 700; }
+  .price-table tfoot td { padding: 12px 14px; font-weight: 700; border-top: 2px solid #eee; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .tf-label { color: #555; }
+  .tf-sum { text-align: right; white-space: nowrap; }
+  .row-mat td { background: #f9f9f9; }
+  .row-work td { background: #fff0f2; }
+  .row-work .tf-sum { color: #c0001a; font-size: 15px; }
+  .row-total td { background: #c0001a; }
+  .row-total .tf-label { color: rgba(255,255,255,0.85); }
+  .row-total .tf-sum { color: #fff; font-size: 17px; }
+  .price-note { font-size: 11px; color: #bbb; text-align: right; margin-top: 8px; }
+
+  .summary-bar {
+    margin-top: 16px; padding: 13px 16px; background: #f0f7ff;
+    border-radius: 12px; font-size: 13px; color: #4a78cc;
+    border-left: 3px solid #4a78cc; line-height: 1.6;
+  }
+
+  @media (max-width: 640px) {
+    .calc-wrap { padding: 12px 12px 60px; }
+    .calc-header { padding: 22px 20px 20px; border-radius: 16px 16px 0 0; }
+    .calc-header h2 { font-size: 19px; }
+    .calc-body { padding: 20px 16px 24px; border-radius: 0 0 16px 16px; }
+    .row.col3 { grid-template-columns: 1fr 1fr; }
+    .row.col3 .field:last-child { grid-column: span 2; }
+    .cards-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .r-card { padding: 11px 12px; }
+    .r-card .rc-val { font-size: 19px; }
+    .price-table colgroup col.col-price { width: 70px; }
+    .price-table thead th { font-size: 9px; padding: 9px 10px; }
+    .price-table tbody td { padding: 10px 10px; font-size: 12px; }
+    .price-table tfoot td { padding: 10px 10px; }
+    .info-card { margin-top: 14px; }
+    .info-card-header { padding: 18px 20px; }
+    .info-card-header h3 { font-size: 15px; }
+    .tech-table td, .ctrl-table td { padding: 10px 12px; font-size: 12px; }
+    .tech-table th, .ctrl-table th { padding: 9px 12px; font-size: 9px; }
+    .tech-step-num { display: none; }
+  }
+
+  .info-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .info-card-header {
+    padding: 20px 28px 18px;
+    color: #fff;
+  }
+  .info-card-header h3 { font-size: 17px; font-weight: 700; margin-bottom: 3px; }
+  .info-card-header p { font-size: 12px; opacity: 0.75; }
+  .info-card-header.dark { background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4e 100%); }
+  .info-card-header.blue { background: linear-gradient(135deg, #0a3d62 0%, #1a5276 100%); }
+  .tech-table, .ctrl-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .tech-table th, .ctrl-table th {
+    background: #f7f7f7; padding: 10px 14px; text-align: left;
+    font-size: 10px; font-weight: 700; color: #aaa;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1.5px solid #eee; white-space: nowrap;
+  }
+  .tech-table td, .ctrl-table td {
+    padding: 11px 14px; border-bottom: 1px solid #f3f3f3;
+    vertical-align: top; line-height: 1.5;
+  }
+  .tech-table tr:last-child td, .ctrl-table tr:last-child td { border-bottom: none; }
+  .tech-step-num { font-weight: 700; color: #c0001a; width: 32px; text-align: center; white-space: nowrap; }
+  .tech-step-name { font-weight: 600; min-width: 140px; white-space: nowrap; }
+  .ctrl-norm { color: #333; min-width: 130px; }
+  .ctrl-tool { color: #888; font-style: italic; min-width: 140px; }
+</style>
+</head>
+<body>
+<div class="calc-wrap">
+  <div class="calc-header">
+    <h2>Калькулятор стяжки пола</h2>
+    <p id="header-sub">Мокрая стяжка ЦПС — расчёт материалов и стоимости работ</p>
+  </div>
+  <div class="calc-body">
+
+    <div class="section-title" style="margin-top:0;">Вид услуги</div>
+    <div class="svc-grid">
+      <div class="svc-btn active" id="svc-mokraya" onclick="setService('mokraya')">
+        <div class="svc-icon">&#128167;</div>
+        <div class="svc-name">Мокрая стяжка пола</div>
+      </div>
+      <div class="svc-btn" id="svc-nalivnoy" onclick="setService('nalivnoy')">
+        <div class="svc-icon">&#127754;</div>
+        <div class="svc-name">Наливной пол</div>
+      </div>
+      <div class="svc-btn" id="svc-polusuhaya" onclick="setService('polusuhaya')">
+        <div class="svc-icon">&#127959;</div>
+        <div class="svc-name">Полусухая стяжка</div>
+      </div>
+      <div class="svc-btn" id="svc-sukhoy" onclick="setService('sukhoy')">
+        <div class="svc-icon">&#128230;</div>
+        <div class="svc-name">Сухой пол</div>
+      </div>
+    </div>
+
+    <div class="section-title">Размеры помещения</div>
+    <div class="row col3">
+      <div class="field">
+        <label>Длина, м</label>
+        <input type="number" id="dlina" placeholder="5.0" min="0.5" max="100" step="0.1" inputmode="decimal" oninput="updateArea()">
+      </div>
+      <div class="field">
+        <label>Ширина, м</label>
+        <input type="number" id="shirina" placeholder="4.0" min="0.5" max="100" step="0.1" inputmode="decimal" oninput="updateArea()">
+      </div>
+      <div class="field">
+        <label>Площадь</label>
+        <div class="area-badge" id="area-badge">— м²</div>
+      </div>
+    </div>
+
+    <div class="section-title" id="thick-title">Толщина стяжки</div>
+    <div class="field">
+      <label><span id="thick-label">50 мм</span></label>
+      <div class="slider-wrap">
+        <input type="range" id="tolshina" min="30" max="150" value="50" step="5" oninput="updateThick()">
+        <div class="slider-val" id="thick-val">50 мм</div>
+      </div>
+      <div class="hint" id="thick-hint">Рекомендуемая: 40–70 мм · Минимум без армирования: 30 мм</div>
+    </div>
+
+    <div id="sec-type">
+      <div class="section-title">Тип стяжки</div>
+      <div class="toggle-group">
+        <div class="toggle-btn active" id="btn-svyaz" onclick="setType('svyaz')">Связанная</div>
+        <div class="toggle-btn" id="btn-plavay" onclick="setType('plavay')">Плавающая</div>
+      </div>
+      <div class="hint" id="type-hint" style="margin-top:8px;">Грунтовка + прямое сцепление с основанием</div>
+    </div>
+
+    <div id="sec-armir">
+      <div class="section-title">Армирование</div>
+      <div class="checkbox-field" id="setka-field" onclick="toggleSetka()">
+        <div class="checkbox-box">
+          <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
+            <path d="M1.5 5L5 8.5L11.5 1.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="cb-text">Добавить кладочную сетку 100×100 (дополнительно к фибре)</span>
+      </div>
+      <div class="hint" style="margin-top:6px;">Фибра полипропиленовая включена всегда</div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Рассчитать материалы и стоимость</button>
+
+    <div class="results" id="results">
+      <div class="results-block">
+        <div class="results-block-title">Количество материалов</div>
+        <div class="cards-grid" id="cards-grid"></div>
+      </div>
+      <div class="results-block">
+        <div class="results-block-title">Смета на материалы и работы</div>
+        <div class="table-scroll">
+          <table class="price-table">
+            <colgroup>
+              <col><col class="col-qty"><col class="col-unit"><col class="col-price"><col class="col-sum">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Материал</th><th>Кол-во</th><th>Ед.</th><th>Цена/ед.</th><th>Сумма</th>
+              </tr>
+            </thead>
+            <tbody id="price-tbody"></tbody>
+            <tfoot id="price-tfoot"></tfoot>
+          </table>
+        </div>
+        <div class="price-note">* Цены ориентировочные, рыночные 2026 г.</div>
+      </div>
+      <div class="summary-bar" id="summary-bar"></div>
+    </div>
+
+  </div>
+
+  <!-- Технология работ -->
+  <div class="info-card">
+    <div class="info-card-header dark">
+      <h3 id="tech-title">Технология работ</h3>
+      <p>Подробная последовательность этапов</p>
+    </div>
+    <div class="table-scroll">
+      <table class="tech-table">
+        <thead><tr><th>№</th><th>Этап</th><th>Описание</th><th>Материалы / инструмент</th></tr></thead>
+        <tbody id="tech-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Технадзор -->
+  <div class="info-card">
+    <div class="info-card-header blue">
+      <h3 id="ctrl-title">Технадзор: контроль качества</h3>
+      <p>Для заказчика — что и как проверять на каждом этапе</p>
+    </div>
+    <div class="table-scroll">
+      <table class="ctrl-table">
+        <thead><tr><th>Этап</th><th>Что проверять</th><th>Норма</th><th>Чем / как проверить</th></tr></thead>
+        <tbody id="ctrl-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var serviceType = 'mokraya';
+var currentType = 'svyaz';
+var setkaOn = false;
+
+var SERVICES = {
+  mokraya:    { thickMin:30,  thickMax:150, thickDefault:50,  thickStep:5, showType:true,  showArmir:true,  rabota:1300, thickTitle:'Толщина стяжки',   hint:'Рекомендуемая: 40–70 мм · Минимум без армирования: 30 мм', sub:'Мокрая стяжка ЦПС — расчёт материалов и стоимости работ' },
+  nalivnoy:   { thickMin:3,   thickMax:30,  thickDefault:10,  thickStep:1, showType:false, showArmir:false, rabota:700,  thickTitle:'Толщина слоя',      hint:'Финишный: 3–5 мм · Выравнивающий: 5–20 мм · Максимум: 30 мм', sub:'Наливной пол — расчёт материалов и стоимости работ' },
+  polusuhaya: { thickMin:40,  thickMax:150, thickDefault:50,  thickStep:5, showType:true,  showArmir:true,  rabota:1400, thickTitle:'Толщина стяжки',   hint:'Рекомендуемая: 40–80 мм · Минимальная: 40 мм', sub:'Полусухая стяжка — расчёт материалов и стоимости работ' },
+  sukhoy:     { thickMin:30,  thickMax:120, thickDefault:50,  thickStep:5, showType:false, showArmir:false, rabota:900,  thickTitle:'Глубина засыпки',  hint:'Глубина засыпки керамзита: 30–120 мм', sub:'Сухой пол Кнауф — расчёт материалов и стоимости работ' }
+};
+
+var P = {
+  cps_meshok25:290, fibra_pack:335, fibra_kg:0.9,
+  lenta_m:35, grunt_10l:1100, mittelgrund_10l:3913, plenka_m2:16,
+  mayak_3m:124, setka_m2:95, stulchik:3,
+  samorez_pak:180, samorez_n:200,
+  dyubel_pak:190, dyubel_n:100,
+  nalivnoy_meshok20:525,
+  igolchatyy:250,
+  zasypka_meshok40:595,
+  gvl_list:507,
+  klej_5kg:380,
+  samorez_gvl_pak:180,
+  lenta_krom_50m:280
+};
+
+function setService(t) {
+  serviceType = t;
+  ['mokraya','nalivnoy','polusuhaya','sukhoy'].forEach(function(k) {
+    document.getElementById('svc-'+k).classList.toggle('active', k===t);
+  });
+  var svc = SERVICES[t];
+  var slider = document.getElementById('tolshina');
+  slider.min = svc.thickMin;
+  slider.max = svc.thickMax;
+  slider.step = svc.thickStep;
+  slider.value = svc.thickDefault;
+  document.getElementById('thick-title').textContent = svc.thickTitle;
+  document.getElementById('thick-hint').textContent = svc.hint;
+  document.getElementById('header-sub').textContent = svc.sub;
+  updateThick();
+  document.getElementById('sec-type').style.display = svc.showType ? '' : 'none';
+  document.getElementById('sec-armir').style.display = svc.showArmir ? '' : 'none';
+  document.getElementById('results').classList.remove('visible');
+  renderInfoTables(t);
+}
+
+function updateArea() {
+  var d=parseFloat(document.getElementById('dlina').value)||0,
+      s=parseFloat(document.getElementById('shirina').value)||0, a=d*s;
+  document.getElementById('area-badge').textContent = a>0 ? a.toFixed(2)+' м²' : '— м²';
+}
+function updateThick() {
+  var v = document.getElementById('tolshina').value;
+  document.getElementById('thick-val').textContent = v+' мм';
+  document.getElementById('thick-label').textContent = v+' мм';
+}
+function setType(t) {
+  currentType = t;
+  document.getElementById('btn-svyaz').classList.toggle('active', t==='svyaz');
+  document.getElementById('btn-plavay').classList.toggle('active', t==='plavay');
+  document.getElementById('type-hint').textContent = t==='svyaz'
+    ? 'Грунтовка + прямое сцепление с основанием'
+    : 'Полиэтиленовая плёнка — стяжка не связана с плитой (тёплый пол, звукоизоляция)';
+}
+function toggleSetka() {
+  setkaOn = !setkaOn;
+  document.getElementById('setka-field').classList.toggle('checked', setkaOn);
+}
+function fmt(n) { return Math.round(n).toLocaleString('ru-RU'); }
+
+function mkCard(label, value, unit, hl, sub) {
+  return '<div class="r-card'+(hl?' hl':'')+'"><div class="rc-label">'+label+'</div><div class="rc-val">'+value+'</div><div class="rc-unit">'+unit+'</div>'+(sub?'<div class="rc-sub">'+sub+'</div>':'')+'</div>';
+}
+
+function renderResults(cards, rows, matTotal, rabota, S, summary) {
+  document.getElementById('cards-grid').innerHTML = cards.join('');
+  document.getElementById('price-tbody').innerHTML = rows.join('');
+  document.getElementById('price-tfoot').innerHTML =
+    '<tr class="row-mat"><td class="tf-label" colspan="4">Итого материалы</td><td class="tf-sum">'+fmt(matTotal)+' ₽</td></tr>'+
+    '<tr class="row-work"><td class="tf-label" colspan="4">Работа ('+fmt(rabota/S)+' ₽/м² × '+S.toFixed(1)+' м²)</td><td class="tf-sum">'+fmt(rabota)+' ₽</td></tr>'+
+    '<tr class="row-total"><td class="tf-label" colspan="4">ИТОГО</td><td class="tf-sum">'+fmt(matTotal+rabota)+' ₽</td></tr>';
+  document.getElementById('summary-bar').innerHTML = summary;
+  document.getElementById('results').classList.add('visible');
+  setTimeout(function(){ document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+}
+
+function addRow(rows, total, name, qty, unit, price, sum) {
+  total[0] += sum;
+  rows.push('<tr><td>'+name+'</td><td>'+fmt(qty)+'</td><td>'+unit+'</td><td>'+fmt(price)+' ₽</td><td>'+fmt(sum)+' ₽</td></tr>');
+}
+
+function calculate() {
+  var dlina = parseFloat(document.getElementById('dlina').value),
+      shirina = parseFloat(document.getElementById('shirina').value),
+      thick = parseInt(document.getElementById('tolshina').value);
+  if (!dlina||!shirina||dlina<=0||shirina<=0) { alert('Введите длину и ширину помещения'); return; }
+  var S = dlina*shirina, perim = 2*(dlina+shirina);
+
+  if (serviceType === 'mokraya' || serviceType === 'polusuhaya') {
+    calcWet(S, thick, perim, dlina, shirina);
+  } else if (serviceType === 'nalivnoy') {
+    calcNalivnoy(S, thick, perim);
+  } else if (serviceType === 'sukhoy') {
+    calcSukhoy(S, thick, perim);
+  }
+}
+
+function calcWet(S, thick, perim, dlina, shirina) {
+  var thickSm = thick/10, thickM = thick/1000;
+  var cpsKg = S*thickSm*18, cpsMesh25 = Math.ceil(cpsKg/25), cpsMesh50 = Math.ceil(cpsKg/50);
+  var fibraKg = parseFloat((S*thickM*0.8).toFixed(2)), fibraPacks = Math.ceil(fibraKg/P.fibra_kg);
+  var lentaM = Math.ceil(perim*1.1), lentaRul = Math.ceil(lentaM/10);
+  var kolMaak = Math.ceil(shirina/1.0)+1, pogM = kolMaak*dlina, profil3m = Math.ceil(pogM/3);
+  var samorezN = kolMaak*Math.ceil(dlina/0.5), samorezPak = Math.ceil(samorezN/P.samorez_n);
+  var dyubelN = samorezN, dyubelPak = Math.ceil(dyubelN/P.dyubel_n);
+  var gruntL=0, gruntKan=0, plenkaM2=0;
+  if (currentType==='svyaz') { gruntL=parseFloat((S*0.15).toFixed(1)); gruntKan=Math.ceil(gruntL/10); }
+  else { plenkaM2=parseFloat((S*1.15).toFixed(1)); }
+  var setkaM2=0, stulchN=0;
+  if (setkaOn) { setkaM2=parseFloat((S*1.1).toFixed(1)); stulchN=Math.ceil(S*4); }
+
+  var cards = [];
+  cards.push(mkCard('Смесь ЦПС', fmt(Math.round(cpsKg)), 'кг', true, 'Мешки 25 кг: '+cpsMesh25+' шт · 50 кг: '+cpsMesh50+' шт'));
+  cards.push(mkCard('Фибра', fibraKg, 'кг', false, fibraPacks+' уп. × 0.9 кг'));
+  cards.push(mkCard('Демпферная лента', lentaM, 'м', false, lentaRul+' рул. × 10 м'));
+  if (currentType==='svyaz') cards.push(mkCard('Грунтовка', gruntL, 'л', false, gruntKan+' кан. × 10 л'));
+  else cards.push(mkCard('Плёнка 200 мкм', plenkaM2, 'м²', false, 'площадь + 15%'));
+  cards.push(mkCard('Маяки 3 м', profil3m, 'шт', false, kolMaak+' рядов · '+dlina.toFixed(1)+' м'));
+  cards.push(mkCard('Саморезы', samorezN, 'шт', false, samorezPak+' уп. × 200 шт'));
+  if (setkaOn) { cards.push(mkCard('Сетка 100×100', setkaM2, 'м²', false, '+10% нахлёст')); cards.push(mkCard('Стульчики', stulchN, 'шт', false, '4 шт/м²')); }
+
+  var rows=[], total=[0];
+  addRow(rows,total,'Смесь ЦПС, мешок 25 кг',cpsMesh25,'мешок',P.cps_meshok25,cpsMesh25*P.cps_meshok25);
+  addRow(rows,total,'Фибра полипропиленовая, уп. 0.9 кг',fibraPacks,'уп.',P.fibra_pack,fibraPacks*P.fibra_pack);
+  addRow(rows,total,'Демпферная лента, рул. 10 м',lentaRul,'рул.',P.lenta_m*10,lentaM*P.lenta_m);
+  if (currentType==='svyaz') addRow(rows,total,'Грунтовка глубокого проникновения, 10 л',gruntKan,'кан.',P.grunt_10l,gruntKan*P.grunt_10l);
+  else addRow(rows,total,'Плёнка п/э 200 мкм',Math.ceil(plenkaM2),'м²',P.plenka_m2,Math.ceil(plenkaM2)*P.plenka_m2);
+  addRow(rows,total,'Маяк штукатурный 6 мм, 3 м',profil3m,'шт',P.mayak_3m,profil3m*P.mayak_3m);
+  addRow(rows,total,'Саморезы 60 мм, уп. 200 шт',samorezPak,'уп.',P.samorez_pak,samorezPak*P.samorez_pak);
+  addRow(rows,total,'Дюбели 6×40, уп. 100 шт',dyubelPak,'уп.',P.dyubel_pak,dyubelPak*P.dyubel_pak);
+  if (setkaOn) { addRow(rows,total,'Сетка кладочная 100×100, м²',Math.ceil(setkaM2),'м²',P.setka_m2,Math.ceil(setkaM2)*P.setka_m2); addRow(rows,total,'Фиксаторы-стульчики',stulchN,'шт',P.stulchik,stulchN*P.stulchik); }
+
+  var svcName = serviceType==='mokraya' ? 'Мокрая стяжка' : 'Полусухая стяжка';
+  var rabota = S * SERVICES[serviceType].rabota;
+  var summary = 'Площадь: <b>'+S.toFixed(2)+' м²</b> · Толщина: <b>'+thick+' мм</b> · Тип: <b>'+svcName+', '+(currentType==='svyaz'?'связанная':'плавающая')+'</b> · Армирование: <b>'+(setkaOn?'фибра + сетка':'фибра')+'</b>';
+  renderResults(cards, rows, total[0], rabota, S, summary);
+}
+
+function calcNalivnoy(S, thick, perim) {
+  var totalKg = S * thick * 1.6;
+  var meshki = Math.ceil(totalKg / 20);
+  var gruntL = parseFloat((S * 0.2).toFixed(1));
+  var gruntKan = Math.ceil(gruntL / 10);
+  var lentaM = Math.ceil(perim * 1.1);
+  var lentaRul = Math.ceil(lentaM / 10);
+  var valik = 1;
+
+  var cards = [];
+  cards.push(mkCard('Наливной пол', fmt(Math.round(totalKg)), 'кг', true, meshki+' мешков × 20 кг'));
+  cards.push(mkCard('Мительгрунд Кнауф', gruntL, 'л', false, gruntKan+' кан. × 10 л'));
+  cards.push(mkCard('Демпферная лента', lentaM, 'м', false, lentaRul+' рул. × 10 м'));
+  if (thick > 5) cards.push(mkCard('Игольчатый валик', valik, 'шт', false, 'для удаления пузырей'));
+
+  var rows=[], total=[0];
+  addRow(rows,total,'Смесь наливного пола, мешок 20 кг',meshki,'мешок',P.nalivnoy_meshok20,meshki*P.nalivnoy_meshok20);
+  addRow(rows,total,'Мительгрунд Кнауф, 10 л',gruntKan,'кан.',P.mittelgrund_10l,gruntKan*P.mittelgrund_10l);
+  addRow(rows,total,'Демпферная лента, рул. 10 м',lentaRul,'рул.',P.lenta_m*10,lentaM*P.lenta_m);
+  if (thick > 5) addRow(rows,total,'Игольчатый валик',valik,'шт',P.igolchatyy,valik*P.igolchatyy);
+
+  var rabota = S * SERVICES.nalivnoy.rabota;
+  var summary = 'Площадь: <b>'+S.toFixed(2)+' м²</b> · Толщина слоя: <b>'+thick+' мм</b> · Расход смеси: <b>'+fmt(Math.round(totalKg))+' кг</b>';
+  renderResults(cards, rows, total[0], rabota, S, summary);
+}
+
+function calcSukhoy(S, thick, perim) {
+  var liters = S * thick;
+  var zasypkaMeshki = Math.ceil(liters / 40);
+  var gvlSheets = Math.ceil(S / 0.72 * 1.1);
+  var klejKg = S * 0.3;
+  var klejPacks = Math.ceil(klejKg / 5);
+  var samorezN = Math.ceil(S * 16);
+  var samorezPak = Math.ceil(samorezN / 200);
+  var lentaM = Math.ceil(perim * 1.1);
+  var lentaRul = Math.ceil(lentaM / 50);
+
+  var cards = [];
+  cards.push(mkCard('Засыпка керамзит', zasypkaMeshki, 'мешков', true, 'мешки 40 л · '+fmt(Math.round(liters))+' л'));
+  cards.push(mkCard('ГВЛ-плиты Кнауф', gvlSheets, 'шт', false, '1200×600 мм · +10% нахлёст'));
+  cards.push(mkCard('Клей ПВА', fmt(Math.round(klejKg)), 'кг', false, klejPacks+' уп. × 5 кг'));
+  cards.push(mkCard('Саморезы ГВЛ', samorezN, 'шт', false, samorezPak+' уп. × 200 шт'));
+  cards.push(mkCard('Кромочная лента', lentaM, 'м', false, lentaRul+' рул. × 50 м'));
+
+  var rows=[], total=[0];
+  addRow(rows,total,'Засыпка Кнауф Компевит, мешок 40 л',zasypkaMeshki,'мешок',P.zasypka_meshok40,zasypkaMeshki*P.zasypka_meshok40);
+  addRow(rows,total,'ГВЛ-плита Кнауф Суперпол 1200×600 мм',gvlSheets,'шт',P.gvl_list,gvlSheets*P.gvl_list);
+  addRow(rows,total,'Клей ПВА строительный, уп. 5 кг',klejPacks,'уп.',P.klej_5kg,klejPacks*P.klej_5kg);
+  addRow(rows,total,'Саморезы для ГВЛ 3.9×19 мм, уп. 200 шт',samorezPak,'уп.',P.samorez_gvl_pak,samorezPak*P.samorez_gvl_pak);
+  addRow(rows,total,'Кромочная лента, рул. 50 м',lentaRul,'рул.',P.lenta_krom_50m,lentaRul*P.lenta_krom_50m);
+
+  var rabota = S * SERVICES.sukhoy.rabota;
+  var summary = 'Площадь: <b>'+S.toFixed(2)+' м²</b> · Засыпка: <b>'+thick+' мм</b> · ГВЛ-плит: <b>'+gvlSheets+' шт</b> · Засыпка: <b>'+zasypkaMeshki+' мешков</b>';
+  renderResults(cards, rows, total[0], rabota, S, summary);
+}
+
+/* ===== ТЕХНОЛОГИЯ И ТЕХНАДЗОР ===== */
+var TECH_DATA = {
+  mokraya: { title:'Технология: мокрая стяжка ЦПС', steps:[
+    ['Подготовка основания','Убрать мусор, пыль, масляные пятна. Срубить выступы перфоратором. Трещины расшить и заделать ремсоставом.','Перфоратор, шпатель, ремсостав'],
+    ['Грунтование','Нанести 2 слоя грунтовки глубокого проникновения роликом без пропусков. Между слоями — 1–2 ч сушки.','Грунтовка КМ-17, валик'],
+    ['Демпферная лента','Проклеить периметр лентой 100 мм по всей высоте стяжки. Компенсирует температурное расширение.','Демпферная лента'],
+    ['Разметка уровня','Лазерным уровнем определить нулевую отметку. Отметить маркером на стенах по всему периметру.','Лазерный уровень'],
+    ['Установка маяков','Маяки 6 мм выставить по уровню на «ляпухах» из раствора, шаг 1,0–1,2 м. Дать схватиться 2–3 ч.','Маяки 3 м, ЦПС'],
+    ['Армирование','Фибру 0,9 кг/м³ добавить в раствор. Сетку уложить на стульчики 20–25 мм, нахлёст 100 мм.','Фибра, сетка, стульчики'],
+    ['Приготовление раствора','ЦПС + вода В/Ц = 0,45–0,50. Принудительным миксером 3–5 мин до однородности. Без комков.','ЦПС, миксер, вода'],
+    ['Укладка и выравнивание','Заливать от дальней стены к выходу. Разравнивать правилом по маякам зигзагообразными движениями.','Правило ≥ 2 м'],
+    ['Уход за стяжкой','Укрыть плёнкой через 6–8 ч. Увлажнять 1–2 раза в сутки 7 суток. Без сквозняков и прогрева.','Плёнка п/э'],
+    ['Демонтаж маяков','Через 48–72 ч извлечь маяки. Борозды заполнить раствором, затереть вровень с плоскостью.','ЦПС, полутёрок']
+  ]},
+  nalivnoy: { title:'Технология: наливной пол', steps:[
+    ['Подготовка основания','Прочное основание без пыли и масла. Наплывы зашлифовать. Трещины расшить и заделать.','Шлифмашина, шпатель, ремсостав'],
+    ['Грунтование Мительгрунд','Концентрат развести 1:5 водой. Нанести 1–2 слоя валиком равномерно без пропусков. Сушка 2–4 ч.','Мительгрунд Кнауф, валик'],
+    ['Демпферная лента','Проклеить периметр лентой — компенсирует тепловое расширение слоя.','Демпферная лента'],
+    ['Разметка толщины','Лазерным уровнем разметить толщину слоя на стенах. Маяки-гребёнки для контроля.','Лазерный уровень, гребёнки'],
+    ['Приготовление смеси','Смесь засыпать в воду (не наоборот!). ~0,18–0,20 л/кг. Миксер 2–3 мин, пауза 3 мин, ещё раз перемешать.','Дрель-миксер, ёмкость ≥ 30 л'],
+    ['Заливка полосами','Выливать полосами от дальней стены. Каждую порцию укладывать пока предыдущая не схватилась (≤ 20 мин). Разровнять ракелью.','Ракля, гребёнка'],
+    ['Аэрация игольчатым валиком','Немедленно (в течение 10 мин) прокатать валиком — удалить пузыри воздуха. Движение крест-накрест.','Игольчатый валик'],
+    ['Уход','Укрыть от сквозняков и солнца минимум 24 ч. Лёгкая ходьба через 6–12 ч. Полная нагрузка — через 7 суток.','Плёнка, закрытые окна']
+  ]},
+  polusuhaya: { title:'Технология: полусухая стяжка', steps:[
+    ['Подготовка основания','Очистить, срубить выступы. Связанный тип — загрунтовать 2 слоя. Плавающий — уложить плёнку.','Перфоратор, грунтовка'],
+    ['Гидроизоляция (плавающая)','Плёнку 200 мкм уложить с нахлёстом 150–200 мм и заходом на стены 100–150 мм. Стыки — скотч.','Плёнка п/э 200 мкм'],
+    ['Демпферная лента','Проклеить периметр лентой по всей высоте стяжки.','Демпферная лента'],
+    ['Разметка и маяки','Лазером определить нулевую отметку. Маяки 6 мм с шагом 1,0–1,2 м, закрепить на раствор.','Лазерный уровень, маяки'],
+    ['Приготовление смеси','ЦПС + минимум воды. Тест: сжать в кулаке — единичные капли, комок держит форму.','ЦПС, вода, миксер'],
+    ['Армирование','Фибру 0,9 кг/м³ добавить в смесь. Сетку уложить на стульчики 20–25 мм.','Фибра, сетка, стульчики'],
+    ['Укладка и трамбовка','Засыпать слоями по 5–7 см, каждый трамбовать. Финальный слой разровнять правилом по маякам.','Правило, виброрейка'],
+    ['Затирка «вертолётом»','Через 1,5–2 ч после укладки затереть машиной. Результат — гладкая прочная поверхность.','Затирочная машина'],
+    ['Деформационные швы','В помещениях >30 м² нарезать швы через 5–6 м, глубина 1/3 толщины стяжки.','Болгарка, диск по бетону'],
+    ['Уход','Укрыть плёнкой на 12–24 ч. Ходить через 12–16 ч. Плитку укладывать через 7–10 суток.','Плёнка п/э']
+  ]},
+  sukhoy: { title:'Технология: сухой пол Кнауф', steps:[
+    ['Подготовка основания','Заделать все щели монтажной пеной. Коммуникации вывести в гофр. Влажность основания ≤ 5%.','Пена, гофр, шпатель'],
+    ['Гидроизоляционная плёнка','Плёнку 200 мкм уложить с заходом на стены 10–15 см. Нахлёст стыков 200 мм — проклеить скотчем. Не крепить к основанию.','Плёнка п/э 200 мкм'],
+    ['Кромочная лента','Проклеить ленту по периметру поверх плёнки. Создаёт зазор засыпки от стен, предотвращает деформацию.','Кромочная лента 50 м'],
+    ['Разметка уровня','Лазерным уровнем определить нулевую отметку и глубину засыпки. Разметить на стенах.','Лазерный уровень'],
+    ['Засыпка керамзита Кнауф','Равномерно засыпать Компевит. Разровнять правилом строго по уровню ±2 мм. По засыпке ходить только по щитам.','Засыпка Кнауф, правило'],
+    ['Укладка 1 слоя ГВЛ','Укладывать от дальней стены. Фальцы промазать клеем ПВА. Целый лист — у входа.','ГВЛ 1200×600, клей ПВА'],
+    ['Укладка 2 слоя ГВЛ','Второй слой со смещением ≥ 250 мм к швам первого. Фальцы — клей, крепление саморезами 3,9×19 шаг 150–200 мм.','ГВЛ, саморезы 3,9×19'],
+    ['Заделка швов и обрезка','Шпаклевать стыки и шляпки саморезов. Обрезать выступающую ленту и плёнку вровень с ГВЛ.','Шпаклёвка, нож']
+  ]}
+};
+
+var CTRL_DATA = {
+  mokraya: { title:'Технадзор: мокрая стяжка', rows:[
+    ['До начала','Прочность основания','Нет глухого звука при простукивании','Молоток, простукивание'],
+    ['До начала','Влажность основания','≤ 5%','Влагомер или плёнка 1×1 м на 24 ч'],
+    ['Грунтование','Равномерное покрытие','Нет пропусков, поверхность потемнела','Визуально'],
+    ['Маяки','Горизонтальность','Отклонение ≤ 1 мм/1 м','Лазерный уровень'],
+    ['Маяки','Шаг маяков','≤ (длина правила − 300 мм)','Рулетка'],
+    ['Раствор','Подвижность смеси','П2–П3: при сжатии держит форму, не течёт','Сжать в кулак'],
+    ['Укладка','Нет пустот под слоем','Плотный звук при простукивании','Арматура ∅8'],
+    ['3 суток','Ровность поверхности','Просвет под 2 м рейкой ≤ 4 мм','Правило 2 м + клинья'],
+    ['28 суток','Прочность на сжатие','М150+: звонкий звук, монета не царапает','Монета или склерометр'],
+    ['28 суток','Влажность стяжки','≤ 5% под плитку, ≤ 3% под паркет','Влагомер CM']
+  ]},
+  nalivnoy: { title:'Технадзор: наливной пол', rows:[
+    ['До начала','Прочность основания','Не крошится, ≥ М20','Простукивание, царапание ключом'],
+    ['До начала','Ровность основания','Неровности ≤ 5 мм/2 м','Правило 2 м'],
+    ['До начала','Влажность основания','≤ 5%','Влагомер или плёнка на 24 ч'],
+    ['Грунтование','Равномерность покрытия','Нет пропусков, поверхность слегка блестит','Визуально'],
+    ['Смесь','Консистенция','Растекается в конус ~18 см (тест расплыва)','Крышка ∅18 см или конус'],
+    ['Заливка','Толщина слоя','±1 мм от проектной','Игла-щуп, маяки-гребёнки'],
+    ['Аэрация','Отсутствие пузырей','Нет кратеров через 30 мин','Визуально'],
+    ['24 ч','Ровность','Просвет ≤ 2 мм/2 м','Правило 2 м'],
+    ['3 суток','Прочность на ходьбу','Не продавливается, нет трещин','Нагрузка + визуально']
+  ]},
+  polusuhaya: { title:'Технадзор: полусухая стяжка', rows:[
+    ['До начала','Прочность и влажность основания','Нет отслоений, влажность ≤ 5%','Молоток, влагомер'],
+    ['Маяки','Горизонтальность','Отклонение ≤ 1 мм/1 м','Лазерный уровень'],
+    ['Смесь','Влажность раствора','Комок держит форму, единичные капли','Сжать в кулаке'],
+    ['Укладка','Послойная трамбовка','Нет пустот, плотный звук','Простукивание'],
+    ['Затирка','Время начала','Через 1,5–2 ч — пока пластичен','Время + след пальца'],
+    ['Затирка','Качество поверхности','Гладкая, нет трещин и рябей','Визуально + правило'],
+    ['3 суток','Ровность','Просвет ≤ 4 мм/2 м','Правило 2 м'],
+    ['28 суток','Прочность','Звонкий звук, монетой не царапается','Монета, молоток'],
+    ['28 суток','Влажность','≤ 5% под плитку, ≤ 3% под паркет','Влагомер CM']
+  ]},
+  sukhoy: { title:'Технадзор: сухой пол Кнауф', rows:[
+    ['До начала','Влажность основания и засыпки','≤ 5%','Влагомер'],
+    ['Плёнка','Целостность и нахлёсты','Нет разрывов, нахлёст ≥ 150 мм','Визуально'],
+    ['Засыпка','Ровность поверхности','±2 мм/2 м','Правило + лазерный уровень'],
+    ['Засыпка','Плотность, нет просадок','Не проседает при ходьбе','Нагрузка ногой'],
+    ['1 слой ГВЛ','Зазоры в стыках','≤ 1 мм','Щуп 1 мм'],
+    ['Склейка','Клей на фальцах','Тонкий равномерный слой по всей ширине фальца','Визуально'],
+    ['Саморезы','Шаг крепления','150–200 мм по периметру фальца','Рулетка'],
+    ['2 слой ГВЛ','Смещение швов','≥ 250 мм от швов 1 слоя','Рулетка'],
+    ['Итог','Ровность покрытия','Просвет ≤ 2 мм/2 м','Правило 2 м'],
+    ['Итог','Нет скрипов и прогибов','При ходьбе нет деформации и звука','Нагрузка + прослушивание']
+  ]}
+};
+
+function renderInfoTables(svcType) {
+  var tech = TECH_DATA[svcType], ctrl = CTRL_DATA[svcType];
+  document.getElementById('tech-title').textContent = tech.title;
+  document.getElementById('tech-tbody').innerHTML = tech.steps.map(function(s,i){
+    return '<tr><td class="tech-step-num">'+(i+1)+'</td><td class="tech-step-name">'+s[0]+'</td><td>'+s[1]+'</td><td class="ctrl-tool">'+s[2]+'</td></tr>';
+  }).join('');
+  document.getElementById('ctrl-title').textContent = ctrl.title;
+  document.getElementById('ctrl-tbody').innerHTML = ctrl.rows.map(function(r){
+    return '<tr><td class="tech-step-name">'+r[0]+'</td><td>'+r[1]+'</td><td class="ctrl-norm">'+r[2]+'</td><td class="ctrl-tool">'+r[3]+'</td></tr>';
+  }).join('');
+}
+renderInfoTables('mokraya');
+</script>
+</body>
+</html>
