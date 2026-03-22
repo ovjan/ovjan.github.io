@@ -236,6 +236,35 @@
   .tech-step-name { font-weight: 600; min-width: 140px; white-space: nowrap; }
   .ctrl-norm { color: #333; min-width: 130px; }
   .ctrl-tool { color: #888; font-style: italic; min-width: 140px; }
+
+  /* === Mobile vertical cards for MAX === */
+  .step-cards { padding: 12px 16px 16px; }
+  .step-card { padding: 14px 0; border-bottom: 1px solid #f3f3f3; }
+  .step-card:last-child { border-bottom: none; }
+  .step-num-name { font-weight: 700; font-size: 14px; color: #1a1a2e; margin-bottom: 6px; }
+  .step-num { color: #c0001a; }
+
+  .ctrl-card { padding: 14px 0; border-bottom: 1px solid #f3f3f3; }
+  .ctrl-card:last-child { border-bottom: none; }
+  .ctrl-stage-badge { display: inline-block; font-size: 11px; font-weight: 700; color: #fff; background: #0a3d62; border-radius: 6px; padding: 2px 8px; margin-bottom: 6px; }
+  .ctrl-what { font-weight: 600; font-size: 14px; color: #1a1a2e; margin-bottom: 4px; }
+  .ctrl-norm-text { font-size: 13px; color: #333; margin-bottom: 3px; }
+  .ctrl-how-text { font-size: 12px; color: #888; font-style: italic; }
+
+  .price-cards { padding: 8px 16px 4px; }
+  .price-card { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f3f3f3; }
+  .price-card:last-child { border-bottom: none; }
+  .price-card-name { font-size: 13px; color: #333; flex: 1; line-height: 1.4; }
+  .price-card-right { text-align: right; flex-shrink: 0; }
+  .price-card-qty { font-size: 11px; color: #aaa; }
+  .price-card-sum { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .price-footer-rows { padding: 4px 16px 16px; }
+  .price-footer-row { display: flex; justify-content: space-between; padding: 9px 0; border-top: 1px solid #eee; font-size: 13px; }
+  .price-footer-row .pf-label { color: #555; }
+  .price-footer-row .pf-val { font-weight: 700; }
+  .price-footer-row.pf-total { border-top: 2px solid #c0001a; }
+  .price-footer-row.pf-total .pf-label { color: #1a1a2e; font-weight: 700; font-size: 15px; }
+  .price-footer-row.pf-total .pf-val { color: #c0001a; font-size: 17px; font-weight: 800; }
 </style>
 </head>
 <body>
@@ -323,20 +352,8 @@
       </div>
       <div class="results-block">
         <div class="results-block-title">Смета на материалы и работы</div>
-        <div class="table-scroll">
-          <table class="price-table">
-            <colgroup>
-              <col><col class="col-qty"><col class="col-unit"><col class="col-price"><col class="col-sum">
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Материал</th><th>Кол-во</th><th>Ед.</th><th>Цена/ед.</th><th>Сумма</th>
-              </tr>
-            </thead>
-            <tbody id="price-tbody"></tbody>
-            <tfoot id="price-tfoot"></tfoot>
-          </table>
-        </div>
+        <div id="price-cards" class="price-cards"></div>
+        <div id="price-footer" class="price-footer-rows"></div>
         <div class="price-note">* Цены ориентировочные, рыночные 2026 г.</div>
       </div>
       <div class="summary-bar" id="summary-bar"></div>
@@ -350,12 +367,7 @@
       <h3 id="tech-title">Технология работ</h3>
       <p>Подробная последовательность этапов</p>
     </div>
-    <div class="table-scroll">
-      <table class="tech-table">
-        <thead><tr><th>№</th><th>Этап</th><th>Описание</th><th>Материалы / инструмент</th></tr></thead>
-        <tbody id="tech-tbody"></tbody>
-      </table>
-    </div>
+    <div id="tech-cards" class="step-cards"></div>
   </div>
 
   <!-- Технадзор -->
@@ -364,12 +376,7 @@
       <h3 id="ctrl-title">Технадзор: контроль качества</h3>
       <p>Для заказчика — что и как проверять на каждом этапе</p>
     </div>
-    <div class="table-scroll">
-      <table class="ctrl-table">
-        <thead><tr><th>Этап</th><th>Что проверять</th><th>Норма</th><th>Чем / как проверить</th></tr></thead>
-        <tbody id="ctrl-tbody"></tbody>
-      </table>
-    </div>
+    <div id="ctrl-cards" class="step-cards"></div>
   </div>
 
 </div>
@@ -452,11 +459,11 @@ function mkCard(label, value, unit, hl, sub) {
 
 function renderResults(cards, rows, matTotal, rabota, S, summary) {
   document.getElementById('cards-grid').innerHTML = cards.join('');
-  document.getElementById('price-tbody').innerHTML = rows.join('');
-  document.getElementById('price-tfoot').innerHTML =
-    '<tr class="row-mat"><td class="tf-label" colspan="4">Итого материалы</td><td class="tf-sum">'+fmt(matTotal)+' ₽</td></tr>'+
-    '<tr class="row-work"><td class="tf-label" colspan="4">Работа ('+fmt(rabota/S)+' ₽/м² × '+S.toFixed(1)+' м²)</td><td class="tf-sum">'+fmt(rabota)+' ₽</td></tr>'+
-    '<tr class="row-total"><td class="tf-label" colspan="4">ИТОГО</td><td class="tf-sum">'+fmt(matTotal+rabota)+' ₽</td></tr>';
+  document.getElementById('price-cards').innerHTML = rows.join('');
+  document.getElementById('price-footer').innerHTML =
+    '<div class="price-footer-row"><span class="pf-label">Итого материалы</span><span class="pf-val">'+fmt(matTotal)+' ₽</span></div>'+
+    '<div class="price-footer-row"><span class="pf-label">Работа ('+fmt(rabota/S)+' ₽/м² × '+S.toFixed(1)+' м²)</span><span class="pf-val">'+fmt(rabota)+' ₽</span></div>'+
+    '<div class="price-footer-row pf-total"><span class="pf-label">ИТОГО</span><span class="pf-val">'+fmt(matTotal+rabota)+' ₽</span></div>';
   document.getElementById('summary-bar').innerHTML = summary;
   document.getElementById('results').classList.add('visible');
   setTimeout(function(){ document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
@@ -464,7 +471,7 @@ function renderResults(cards, rows, matTotal, rabota, S, summary) {
 
 function addRow(rows, total, name, qty, unit, price, sum) {
   total[0] += sum;
-  rows.push('<tr><td>'+name+'</td><td>'+fmt(qty)+'</td><td>'+unit+'</td><td>'+fmt(price)+' ₽</td><td>'+fmt(sum)+' ₽</td></tr>');
+  rows.push('<div class="price-card"><div class="price-card-name">'+name+'</div><div class="price-card-right"><div class="price-card-qty">'+fmt(qty)+' '+unit+' × '+fmt(price)+' ₽</div><div class="price-card-sum">'+fmt(sum)+' ₽</div></div></div>');
 }
 
 function calculate() {
@@ -680,12 +687,12 @@ var CTRL_DATA = {
 function renderInfoTables(svcType) {
   var tech = TECH_DATA[svcType], ctrl = CTRL_DATA[svcType];
   document.getElementById('tech-title').textContent = tech.title;
-  document.getElementById('tech-tbody').innerHTML = tech.steps.map(function(s,i){
-    return '<tr><td class="tech-step-num">'+(i+1)+'</td><td class="tech-step-name">'+s[0]+'</td><td>'+s[1]+'</td><td class="ctrl-tool">'+s[2]+'</td></tr>';
+  document.getElementById('tech-cards').innerHTML = tech.steps.map(function(s,i){
+    return '<div class="step-card"><div class="step-num-name"><span class="step-num">'+(i+1)+'.</span> '+s[0]+'</div><div class="step-desc">'+s[1]+'</div></div>';
   }).join('');
   document.getElementById('ctrl-title').textContent = ctrl.title;
-  document.getElementById('ctrl-tbody').innerHTML = ctrl.rows.map(function(r){
-    return '<tr><td class="tech-step-name">'+r[0]+'</td><td>'+r[1]+'</td><td class="ctrl-norm">'+r[2]+'</td><td class="ctrl-tool">'+r[3]+'</td></tr>';
+  document.getElementById('ctrl-cards').innerHTML = ctrl.rows.map(function(r){
+    return '<div class="ctrl-card"><div class="ctrl-stage-badge">'+r[0]+'</div><div class="ctrl-what">'+r[1]+'</div><div class="ctrl-norm-text">'+r[2]+'</div><div class="ctrl-how-text">'+r[3]+'</div></div>';
   }).join('');
 }
 renderInfoTables('mokraya');
