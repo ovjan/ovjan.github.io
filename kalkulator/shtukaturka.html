@@ -207,6 +207,8 @@
   .vc-price-row.vc-pf-total { border-top: 2px solid #c0001a; }
   .vc-price-row.vc-pf-total .vc-pf-label { color: #1a1a2e; font-weight: 700; font-size: 15px; }
   .vc-price-row.vc-pf-total .vc-pf-val { color: #c0001a; font-size: 17px; font-weight: 800; }
+  /* iOS: font-size >= 16px предотвращает авто-зум при фокусе на input */
+  input[type="number"], input[type="text"], select, textarea { font-size: 16px !important; }
 </style>
 </head>
 <body class="bg-surface text-on-surface antialiased pb-8">
