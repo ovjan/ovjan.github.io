@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор штукатурки</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          "primary":                    "#930011",
+          "primary-container":          "#c0001a",
+          "on-primary":                 "#ffffff",
+          "surface":                    "#ffffff",
+          "surface-dim":                "#d9dadc",
+          "surface-variant":            "#e2e2e4",
+          "surface-container":          "#eeeef0",
+          "surface-container-low":      "#f3f3f5",
+          "surface-container-high":     "#e8e8ea",
+          "surface-container-highest":  "#e2e2e4",
+          "surface-container-lowest":   "#efefef",
+          "on-surface":                 "#1a1c1d",
+          "on-surface-variant":         "#5c3f3d",
+          "outline":                    "#916f6c",
+          "outline-variant":            "#e6bdb9",
+          "tertiary":                   "#004880",
+          "tertiary-container":         "#0060a8",
+          "on-tertiary":                "#ffffff",
+        },
+        fontFamily: {
+          sans: ["Manrope", "sans-serif"],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 1;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    vertical-align: middle;
+  }
+  body { font-family: 'Manrope', sans-serif; min-height: 100dvh; }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 4px;
+    background: #e2e2e4;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #c0001a;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(192,0,26,0.35);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #c0001a;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 8px rgba(192,0,26,0.35);
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type="number"] { -moz-appearance: textfield; }
+
+  .custom-scrollbar::-webkit-scrollbar { height: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: #f3f3f5; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #c0001a; border-radius: 10px; }
+
+  @media (min-width: 1024px) {
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+      gap: 2rem;
+      align-items: start;
+    }
+    .col-left {
+      position: sticky;
+      top: 72px;
+    }
+  }
+  @media (min-width: 1280px) {
+    .main-grid {
+      grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
+    }
+  }
+
+  .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+  button, a { touch-action: manipulation; }
+
+  @media (max-width: 360px) {
+    .input-grid input, .input-grid .area-badge {
+      font-size: 13px !important;
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+    }
+  }
+
+  /* ========== ПЕЧАТЬ ========== */
+  @media print {
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    header, .col-left, #print-btn,
+    #tech-arrow, #ctrl-arrow,
+    #print-header, #summary-bar, #cards-grid,
+    #results > .flex,
+    #results > section:first-of-type,
+    .lg\\:hidden { display: none !important; }
+
+    #tech-body, #ctrl-body { display: block !important; }
+
+    button.bg-on-surface, button.bg-tertiary-container {
+      display: flex !important;
+      cursor: default !important;
+    }
+
+    body { background: #fff !important; padding: 0; margin: 0; font-size: 11pt; }
+    main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    .main-grid { display: block !important; }
+    .col-right { width: 100% !important; }
+    #results { display: block !important; }
+
+    #print-header {
+      display: flex !important;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid #c0001a;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    #print-header h1 { font-size: 16pt; font-weight: 900; color: #c0001a; margin: 0; }
+    #print-header p  { font-size: 10pt; color: #555; margin: 2px 0 0; }
+    #print-header .print-meta { text-align: right; font-size: 9pt; color: #777; }
+
+    .space-y-5 > * + * { margin-top: 14pt !important; }
+    section { break-inside: avoid; }
+
+    #cards-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+    #cards-grid > div { border: 1px solid #ddd !important; border-radius: 6px !important; padding: 8px !important; background: #fff !important; }
+
+    #summary-bar { background: #e8f0fe !important; border-left: 4px solid #1a73e8 !important; padding: 8px 12px !important; border-radius: 0 6px 6px 0 !important; font-size: 10pt !important; }
+
+    table { width: 100% !important; border-collapse: collapse !important; min-width: unset !important; font-size: 9.5pt !important; }
+    th { background: #f0f0f2 !important; color: #333 !important; border: 1px solid #ccc !important; padding: 5px 8px !important; text-align: left !important; font-size: 8.5pt !important; }
+    td { border: 1px solid #ddd !important; padding: 5px 8px !important; vertical-align: top !important; }
+    tr:nth-child(even) td { background: #fafafa !important; }
+    tfoot td { font-weight: 900 !important; background: #f5f5f7 !important; border-top: 2px solid #999 !important; color: #111 !important; }
+
+    .bg-on-surface, .bg-tertiary-container {
+      background: #333 !important;
+      color: #fff !important;
+      padding: 6px 10px !important;
+      border-radius: 4px 4px 0 0 !important;
+    }
+    .bg-surface-container-low { background: #f5f5f7 !important; }
+    .overflow-x-auto { overflow: visible !important; }
+    a { color: inherit !important; text-decoration: none !important; }
+  }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased pb-8">
+
+<!-- Header -->
+<header class="bg-gradient-to-br from-red-700 to-red-600 shadow-lg shadow-red-900/20 sticky top-0 z-50">
+  <div class="relative flex items-stretch max-w-screen-xl mx-auto" style="min-height:64px">
+    <div class="flex items-center px-5 py-3">
+      <img src="logo_1.svg" alt="Логотип" style="height:42px;width:auto;filter:brightness(0) invert(1);">
+    </div>
+    <div class="flex-1 flex items-center justify-center">
+      <p id="header-sub" class="text-white font-extrabold text-sm uppercase tracking-wider text-center leading-tight">Ручная гипсовая штукатурка</p>
+    </div>
+    <div class="flex items-center px-4">
+      <button class="text-white/70 hover:text-white transition-opacity active:scale-95 p-1">
+        <span class="material-symbols-outlined">share</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+  <div class="main-grid">
+
+    <!-- Левая колонка: настройки -->
+    <div class="col-left space-y-5">
+
+      <!-- Вид услуги -->
+      <section>
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Вид штукатурки</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3">
+          <button id="svc-ruchnaya" onclick="setService('ruchnaya')"
+            class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-[0.97] border-primary-container bg-red-50">
+            <span class="text-2xl leading-none">&#129529;</span>
+            <span class="text-xs font-bold text-primary leading-tight text-center">Ручная гипсовая</span>
+          </button>
+          <button id="svc-tsementnaya" onclick="setService('tsementnaya')"
+            class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#129521;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Цементная</span>
+          </button>
+          <button id="svc-mekhan" onclick="setService('mekhan')"
+            class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#9881;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Механизированная</span>
+          </button>
+          <button id="svc-koroyed" onclick="setService('koroyed')"
+            class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#127807;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Короед</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Размеры помещения -->
+      <section class="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-4">Размеры помещения</p>
+        <div class="input-grid grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-bold text-on-surface-variant">Длина, м</label>
+            <input type="number" id="dlina" placeholder="5.0" min="0.5" max="100" step="0.1" inputmode="decimal"
+              oninput="updateArea()"
+              class="px-2 sm:px-3 py-3 rounded-xl border-2 border-surface-container-high bg-surface-container-low text-on-surface font-bold text-[14px] sm:text-[15px] focus:border-primary-container focus:outline-none transition-colors w-full">
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-bold text-on-surface-variant">Ширина, м</label>
+            <input type="number" id="shirina" placeholder="4.0" min="0.5" max="100" step="0.1" inputmode="decimal"
+              oninput="updateArea()"
+              class="px-2 sm:px-3 py-3 rounded-xl border-2 border-surface-container-high bg-surface-container-low text-on-surface font-bold text-[14px] sm:text-[15px] focus:border-primary-container focus:outline-none transition-colors w-full">
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-bold text-on-surface-variant">Высота, м</label>
+            <input type="number" id="vysota" placeholder="2.7" min="1.5" max="10" step="0.1" inputmode="decimal"
+              oninput="updateArea()"
+              class="px-2 sm:px-3 py-3 rounded-xl border-2 border-surface-container-high bg-surface-container-low text-on-surface font-bold text-[14px] sm:text-[15px] focus:border-primary-container focus:outline-none transition-colors w-full">
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-bold text-on-surface-variant">Площадь стен</label>
+            <div id="area-badge" class="area-badge px-2 sm:px-3 py-3 rounded-xl bg-red-50 border-2 border-red-200 text-primary-container font-black text-[14px] sm:text-[15px] min-h-[50px] flex items-center leading-tight">— м²</div>
+          </div>
+        </div>
+        <p class="text-[11px] text-on-surface-variant mt-3 px-0.5">Площадь рассчитывается как периметр × высота (без вычета проёмов)</p>
+      </section>
+
+      <!-- Толщина слоя -->
+      <section id="sec-thick" class="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <p id="thick-title" class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Толщина слоя</p>
+          <div id="thick-val" class="px-3 py-1 bg-red-50 border-2 border-primary-container rounded-full text-primary-container font-black text-sm">15 мм</div>
+        </div>
+        <input type="range" id="tolshina" min="5" max="30" value="15" step="1" oninput="updateThick()">
+        <p id="thick-hint" class="text-[11px] text-on-surface-variant mt-3 leading-relaxed">Рекомендуемая: 10–20 мм · Максимум за 1 проход: 30 мм</p>
+      </section>
+
+      <!-- Штукатурная сетка (только для цементной) -->
+      <div id="sec-setka-ts" style="display:none">
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Армирование</p>
+        <button id="setka-ts-field" onclick="toggleSetkaTs()"
+          class="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-surface-container-high bg-surface-container-lowest transition-all active:scale-[0.98]">
+          <div id="checkbox-ts-box" class="w-6 h-6 rounded-lg border-2 border-outline flex items-center justify-center flex-shrink-0 transition-all">
+            <span id="check-ts-icon" class="material-symbols-outlined text-white" style="font-size:16px;display:none">check</span>
+          </div>
+          <span id="cb-ts-text" class="text-sm font-semibold text-on-surface-variant text-left leading-snug">Штукатурная сетка (щелочестойкая, нахлёст 100 мм)</span>
+        </button>
+        <p class="text-[11px] text-on-surface-variant mt-2 px-1">Рекомендуется при трещинах, стыках материалов и слое &gt; 20 мм</p>
+      </div>
+
+      <!-- Размер зерна (только для Короед) -->
+      <div id="sec-zerno" style="display:none">
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Размер зерна</p>
+        <div class="grid grid-cols-2 gap-2 p-1.5 bg-surface-container rounded-xl">
+          <button id="btn-z2" onclick="setZerno(2)"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] bg-primary-container text-white shadow-sm">
+            Зерно 2 мм
+          </button>
+          <button id="btn-z3" onclick="setZerno(3)"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] text-on-surface-variant">
+            Зерно 3 мм
+          </button>
+        </div>
+        <p id="zerno-hint" class="text-[11px] text-on-surface-variant mt-2 px-1">Расход 2.5 кг/м² · более тонкая фактура</p>
+      </div>
+
+      <!-- Кнопка расчёта -->
+      <button onclick="calculate()"
+        class="w-full bg-gradient-to-br from-primary to-primary-container text-white font-black py-5 rounded-xl shadow-lg shadow-red-900/25 active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-wider">
+        <span class="material-symbols-outlined">calculate</span>
+        Рассчитать материалы и стоимость
+      </button>
+
+    </div><!-- /col-left -->
+
+    <!-- Правая колонка: результаты + таблицы -->
+    <div class="space-y-5 mt-5 lg:mt-0">
+
+      <!-- Print-only header -->
+      <div id="print-header" style="display:none">
+        <div>
+          <img src="logo_2.svg" alt="Логотип" style="height:40px;width:auto;margin-bottom:6px;display:block;">
+          <h1 id="print-title">Смета штукатурки стен</h1>
+          <p id="print-sub">Ручная гипсовая штукатурка</p>
+        </div>
+        <div class="print-meta">
+          <div id="print-area-info"></div>
+          <div id="print-date"></div>
+        </div>
+      </div>
+
+      <div id="results" style="display:none" class="space-y-5">
+
+        <!-- Кнопка печати -->
+        <div class="flex justify-end">
+          <button id="print-btn" onclick="window.print()"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-on-surface text-white font-bold text-sm hover:opacity-90 active:scale-[0.97] transition-all shadow-sm">
+            <span class="material-symbols-outlined" style="font-size:18px">print</span>
+            Распечатать смету
+          </button>
+        </div>
+
+        <!-- Карточки материалов -->
+        <section>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-extrabold text-xl tracking-tight">Количество материалов</h2>
+          </div>
+          <div id="cards-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+        </section>
+
+        <!-- Сводка -->
+        <div id="summary-bar" class="p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500 text-sm text-blue-700 leading-relaxed font-medium"></div>
+
+        <!-- Таблица сметы -->
+        <section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+          <div class="px-4 py-4 bg-surface-container-low border-b border-surface-container">
+            <h2 class="font-extrabold text-base uppercase tracking-tight">Смета материалов и работ</h2>
+          </div>
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-[13px] border-collapse" style="min-width:380px">
+              <thead>
+                <tr class="bg-surface-container-high text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
+                  <th class="px-4 py-3">Материал</th>
+                  <th class="px-3 py-3 text-right">Кол-во</th>
+                  <th class="px-3 py-3">Ед.</th>
+                  <th class="px-3 py-3 text-right">Цена</th>
+                  <th class="px-4 py-3 text-right">Сумма</th>
+                </tr>
+              </thead>
+              <tbody id="price-tbody"></tbody>
+              <tfoot id="price-tfoot"></tfoot>
+            </table>
+          </div>
+          <p class="text-[11px] text-on-surface-variant/60 text-right px-4 py-2">* Цены ориентировочные, рыночные 2026 г.</p>
+        </section>
+
+      </div><!-- /results -->
+
+      <!-- Технология работ -->
+      <section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <button onclick="toggleSection('tech-body')" class="w-full bg-on-surface px-4 py-4 flex items-center gap-3 text-left">
+          <span class="material-symbols-outlined text-white">construction</span>
+          <h3 id="tech-title" class="text-white font-extrabold text-sm uppercase tracking-wider flex-1">Технология работ</h3>
+          <span id="tech-arrow" class="material-symbols-outlined text-white transition-transform duration-200" style="font-size:20px">expand_more</span>
+        </button>
+        <div id="tech-body" style="display:none">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-sm border-collapse" style="min-width:500px">
+              <thead>
+                <tr class="bg-surface-container-low text-[10px] font-black uppercase tracking-wider text-on-surface-variant">
+                  <th class="px-4 py-3 w-10">№</th>
+                  <th class="px-3 py-3 w-36">Этап</th>
+                  <th class="px-3 py-3">Описание</th>
+                  <th class="px-4 py-3 w-44">Материалы / инструмент</th>
+                </tr>
+              </thead>
+              <tbody id="tech-tbody"></tbody>
+            </table>
+          </div>
+          <div class="px-4 py-2 bg-surface-container-low/50 text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5 lg:hidden">
+            <span class="material-symbols-outlined" style="font-size:13px">swipe_right</span>
+            Листайте таблицу вправо для полной информации
+          </div>
+        </div>
+      </section>
+
+      <!-- Технадзор -->
+      <section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <button onclick="toggleSection('ctrl-body')" class="w-full bg-tertiary-container px-4 py-4 flex items-center gap-3 text-left">
+          <span class="material-symbols-outlined text-white">fact_check</span>
+          <h3 id="ctrl-title" class="text-white font-extrabold text-sm uppercase tracking-wider flex-1">Технадзор: контроль качества</h3>
+          <span id="ctrl-arrow" class="material-symbols-outlined text-white transition-transform duration-200" style="font-size:20px">expand_more</span>
+        </button>
+        <div id="ctrl-body" style="display:none">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs border-collapse" style="min-width:460px">
+              <thead>
+                <tr class="bg-surface-container-low text-[10px] font-black uppercase tracking-wider text-on-surface-variant">
+                  <th class="px-4 py-3 w-24">Этап</th>
+                  <th class="px-3 py-3 w-40">Что проверять</th>
+                  <th class="px-3 py-3 w-36">Норма</th>
+                  <th class="px-4 py-3">Как / чем проверить</th>
+                </tr>
+              </thead>
+              <tbody id="ctrl-tbody"></tbody>
+            </table>
+          </div>
+          <div class="px-4 py-2 bg-blue-50 text-[11px] font-bold text-blue-600 flex items-center gap-1.5 lg:hidden">
+            <span class="material-symbols-outlined text-blue-500" style="font-size:13px">swipe_right</span>
+            Листайте таблицу вправо для полной информации
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /col-right -->
+
+  </div><!-- /main-grid -->
+</main>
+
+<script>
+if (window.location.search.indexOf('embed=1') !== -1) {
+  var _h = document.querySelector('header');
+  if (_h) _h.style.display = 'none';
+  var _s = document.createElement('style');
+  _s.textContent = '.col-left{top:8px!important}';
+  document.head.appendChild(_s);
+}
+function toggleSection(id) {
+  var body = document.getElementById(id);
+  var arrowId = id.replace('-body', '-arrow');
+  var arrow = document.getElementById(arrowId);
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+var serviceType = 'ruchnaya';
+var zernoVal = 2;
+var setkaTsOn = false;
+
+var SERVICES = {
+  ruchnaya:    { thickMin:5,  thickMax:30, thickDefault:15, thickStep:1, showThick:true,  showZerno:false, rabota:650, thickTitle:'Толщина слоя', hint:'Рекомендуемая: 10–20 мм · Максимум за 1 проход: 30 мм', sub:'Ручная гипсовая штукатурка' },
+  tsementnaya: { thickMin:10, thickMax:50, thickDefault:20, thickStep:2, showThick:true,  showZerno:false, rabota:1000, thickTitle:'Толщина слоя', hint:'Рекомендуемая: 15–25 мм · Кнауф Унтерпутц / Зокельпутц', sub:'Цементная штукатурка' },
+  mekhan:      { thickMin:5,  thickMax:30, thickDefault:15, thickStep:1, showThick:true,  showZerno:false, rabota:450, thickTitle:'Толщина слоя', hint:'Рекомендуемая: 10–20 мм · Нанесение машиной Knauf PFT / Kaleta', sub:'Механизированная штукатурка' },
+  koroyed:     { thickMin:2,  thickMax:3,  thickDefault:2,  thickStep:1, showThick:false, showZerno:true,  rabota:550, thickTitle:'Размер зерна', hint:'Зерно 2 мм: расход 2.5 кг/м² · Зерно 3 мм: расход 3.2 кг/м²', sub:'Штукатурка Короед' }
+};
+
+var P = {
+  rotband_30kg:       950,
+  unterputz_25kg:     720,
+  mp75_30kg:          780,
+  koroyed_25kg:       850,
+  grunt_10l:         1100,
+  tifengrund_10l:    1250,
+  kvarts_grunt_7kg:   680,
+  mayak_3m:           124,
+  ugolok_3m:           85,
+  serpyanka_50m:      180,
+  shtuk_setka_m2:      45,
+  vosk_1kg:           380,
+  samorez_pak:        180
+};
+
+function setService(t) {
+  serviceType = t;
+  ['ruchnaya','tsementnaya','mekhan','koroyed'].forEach(function(k) {
+    var btn = document.getElementById('svc-' + k);
+    var label = btn.querySelector('span:last-child');
+    if (k === t) {
+      btn.classList.add('border-primary-container', 'bg-red-50');
+      btn.classList.remove('border-surface-container-high', 'bg-surface-container-lowest');
+      label.classList.add('text-primary');
+      label.classList.remove('text-on-surface-variant');
+    } else {
+      btn.classList.remove('border-primary-container', 'bg-red-50');
+      btn.classList.add('border-surface-container-high', 'bg-surface-container-lowest');
+      label.classList.remove('text-primary');
+      label.classList.add('text-on-surface-variant');
+    }
+  });
+  var svc = SERVICES[t];
+  var slider = document.getElementById('tolshina');
+  slider.min = svc.thickMin;
+  slider.max = svc.thickMax;
+  slider.step = svc.thickStep;
+  slider.value = svc.thickDefault;
+  document.getElementById('thick-title').textContent = svc.thickTitle;
+  document.getElementById('thick-hint').textContent = svc.hint;
+  document.getElementById('header-sub').textContent = svc.sub;
+  updateThick();
+  document.getElementById('sec-thick').style.display = svc.showThick ? '' : 'none';
+  document.getElementById('sec-zerno').style.display = svc.showZerno ? '' : 'none';
+  document.getElementById('sec-setka-ts').style.display = (t === 'tsementnaya') ? '' : 'none';
+  document.getElementById('results').style.display = 'none';
+  renderInfoTables(t);
+}
+
+function updateArea() {
+  var d = parseFloat(document.getElementById('dlina').value) || 0;
+  var s = parseFloat(document.getElementById('shirina').value) || 0;
+  var h = parseFloat(document.getElementById('vysota').value) || 0;
+  var a = 2 * (d + s) * h;
+  document.getElementById('area-badge').textContent = a > 0 ? a.toFixed(2) + ' м²' : '— м²';
+}
+
+function updateThick() {
+  var v = document.getElementById('tolshina').value;
+  document.getElementById('thick-val').textContent = v + ' мм';
+}
+
+function setZerno(z) {
+  zernoVal = z;
+  var btn2 = document.getElementById('btn-z2');
+  var btn3 = document.getElementById('btn-z3');
+  if (z === 2) {
+    btn2.classList.add('bg-primary-container', 'text-white', 'shadow-sm');
+    btn2.classList.remove('text-on-surface-variant');
+    btn3.classList.remove('bg-primary-container', 'text-white', 'shadow-sm');
+    btn3.classList.add('text-on-surface-variant');
+    document.getElementById('zerno-hint').textContent = 'Расход 2.5 кг/м² · более тонкая фактура';
+  } else {
+    btn3.classList.add('bg-primary-container', 'text-white', 'shadow-sm');
+    btn3.classList.remove('text-on-surface-variant');
+    btn2.classList.remove('bg-primary-container', 'text-white', 'shadow-sm');
+    btn2.classList.add('text-on-surface-variant');
+    document.getElementById('zerno-hint').textContent = 'Расход 3.2 кг/м² · более выраженная фактура';
+  }
+}
+
+function toggleSetkaTs() {
+  setkaTsOn = !setkaTsOn;
+  var btn  = document.getElementById('setka-ts-field');
+  var box  = document.getElementById('checkbox-ts-box');
+  var icon = document.getElementById('check-ts-icon');
+  var text = document.getElementById('cb-ts-text');
+  if (setkaTsOn) {
+    btn.classList.add('border-primary-container', 'bg-red-50');
+    btn.classList.remove('border-surface-container-high');
+    box.classList.add('bg-primary-container', 'border-primary-container');
+    box.classList.remove('border-outline');
+    icon.style.display = 'inline-block';
+    text.classList.add('text-primary');
+    text.classList.remove('text-on-surface-variant');
+  } else {
+    btn.classList.remove('border-primary-container', 'bg-red-50');
+    btn.classList.add('border-surface-container-high');
+    box.classList.remove('bg-primary-container', 'border-primary-container');
+    box.classList.add('border-outline');
+    icon.style.display = 'none';
+    text.classList.remove('text-primary');
+    text.classList.add('text-on-surface-variant');
+  }
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('ru-RU'); }
+
+function mkCard(label, value, unit, hl, sub) {
+  return '<div style="background:#fff;border-radius:12px;border-left:4px solid '+(hl?'#c0001a':'#e8e8ea')+';padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.04);display:flex;flex-direction:column;gap:8px;min-height:100px">' +
+    '<p style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#5c3f3d;line-height:1.3">' + label + '</p>' +
+    '<div style="display:flex;align-items:baseline;gap:4px">' +
+    '<span style="font-size:24px;font-weight:800;color:'+(hl?'#c0001a':'#1a1c1d')+';line-height:1">' + value + '</span>' +
+    '<span style="font-size:12px;font-weight:700;color:#5c3f3d">' + unit + '</span>' +
+    '</div>' +
+    (sub ? '<p style="font-size:10px;color:#916f6c;line-height:1.4">' + sub + '</p>' : '') +
+    '</div>';
+}
+
+function renderResults(cards, rows, matTotal, rabota, S, summary) {
+  document.getElementById('cards-grid').innerHTML = cards.join('');
+  document.getElementById('price-tbody').innerHTML = rows.join('');
+  document.getElementById('price-tfoot').innerHTML =
+    '<tr style="background:#f3f3f5"><td class="px-4 py-3 text-on-surface-variant font-black uppercase" style="font-size:11px;letter-spacing:0.06em" colspan="4">Итого материалы</td><td class="px-4 py-3 text-right font-bold">' + fmt(matTotal) + ' ₽</td></tr>' +
+    '<tr style="background:#fff0f2"><td class="px-4 py-3 text-primary font-black uppercase" style="font-size:11px;letter-spacing:0.06em" colspan="4">Работа (' + fmt(rabota/S) + ' ₽/м² × ' + S.toFixed(1) + ' м²)</td><td class="px-4 py-3 text-right font-bold text-primary">' + fmt(rabota) + ' ₽</td></tr>' +
+    '<tr style="background:#c0001a"><td class="px-4 py-4 font-black uppercase text-white" style="font-size:13px;letter-spacing:0.08em" colspan="4">ИТОГО</td><td class="px-4 py-4 text-right font-black text-white" style="font-size:18px">' + fmt(matTotal + rabota) + ' ₽</td></tr>';
+  document.getElementById('summary-bar').innerHTML = summary;
+  document.getElementById('results').style.display = 'block';
+  var svcSub = SERVICES[serviceType].sub;
+  var dlV = document.getElementById('dlina').value, shV = document.getElementById('shirina').value, hvV = document.getElementById('vysota').value;
+  document.getElementById('print-title').textContent = 'Смета: ' + svcSub;
+  document.getElementById('print-sub').textContent = 'Помещение: ' + dlV + ' × ' + shV + ' м, высота ' + hvV + ' м, площадь стен ' + S.toFixed(1) + ' м²';
+  var now = new Date(); var months = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  document.getElementById('print-date').textContent = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+  setTimeout(function() { document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
+}
+
+function addRow(rows, total, name, qty, unit, price, sum) {
+  total[0] += sum;
+  var bg = rows.length % 2 === 0 ? '#ffffff' : '#f9f9fb';
+  rows.push('<tr style="background:' + bg + '">' +
+    '<td class="px-4 py-3 font-medium">' + name + '</td>' +
+    '<td class="px-3 py-3 text-right text-on-surface-variant">' + fmt(qty) + '</td>' +
+    '<td class="px-3 py-3 text-on-surface-variant">' + unit + '</td>' +
+    '<td class="px-3 py-3 text-right text-on-surface-variant">' + fmt(price) + ' ₽</td>' +
+    '<td class="px-4 py-3 text-right font-bold">' + fmt(sum) + ' ₽</td>' +
+    '</tr>');
+}
+
+function calculate() {
+  var dlina   = parseFloat(document.getElementById('dlina').value),
+      shirina = parseFloat(document.getElementById('shirina').value),
+      vysota  = parseFloat(document.getElementById('vysota').value),
+      thick   = parseInt(document.getElementById('tolshina').value);
+  if (!dlina || !shirina || !vysota || dlina <= 0 || shirina <= 0 || vysota <= 0) {
+    alert('Введите длину, ширину и высоту помещения');
+    return;
+  }
+  var perim = 2 * (dlina + shirina);
+  var S = perim * vysota;
+
+  if (serviceType === 'ruchnaya') {
+    calcRuchnaya(S, thick, perim, vysota);
+  } else if (serviceType === 'tsementnaya') {
+    calcTsementnaya(S, thick, perim, vysota);
+  } else if (serviceType === 'mekhan') {
+    calcMekhan(S, thick, perim, vysota);
+  } else if (serviceType === 'koroyed') {
+    calcKoroyed(S, perim, vysota);
+  }
+}
+
+function getMayakiUgolki(perim, vysota) {
+  var colCount   = Math.ceil(perim / 1.2);
+  var mayakRows  = Math.ceil(vysota / 3);
+  var totalMayak = colCount * mayakRows;
+  var ugolokPogM = 4 * vysota;
+  var totalUgolok = Math.ceil(ugolokPogM / 3);
+  return { colCount: colCount, totalMayak: totalMayak, totalUgolok: totalUgolok, ugolokPogM: ugolokPogM };
+}
+
+function calcRuchnaya(S, thick, perim, vysota) {
+  var smesKg    = parseFloat((S * (thick / 10) * 8.5).toFixed(1));
+  var meshki30  = Math.ceil(smesKg / 30);
+  var gruntL    = parseFloat((S * 0.15).toFixed(1));
+  var gruntKan  = Math.ceil(gruntL / 10);
+  var mk        = getMayakiUgolki(perim, vysota);
+  var serpRul   = Math.ceil(S / 25);
+
+  var cards = [];
+  cards.push(mkCard('Гипс. штукатурка Ротбанд', fmt(Math.round(smesKg)), 'кг', true, meshki30 + ' мешков × 30 кг'));
+  cards.push(mkCard('Грунтовка ГП', gruntL, 'л', false, gruntKan + ' кан. × 10 л'));
+  cards.push(mkCard('Маяки профильные', mk.totalMayak, 'шт', false, mk.colCount + ' рядов · маяк 3 м'));
+  cards.push(mkCard('Уголки перфорир.', mk.totalUgolok, 'шт', false, '4 угла × ' + vysota.toFixed(1) + ' м'));
+  cards.push(mkCard('Серпянка', serpRul, 'рул.', false, 'рулон 50 м · швы и стыки'));
+
+  var rows = [], total = [0];
+  addRow(rows, total, 'Гипсовая штукатурка Кнауф Ротбанд, мешок 30 кг', meshki30, 'мешок', P.rotband_30kg, meshki30 * P.rotband_30kg);
+  addRow(rows, total, 'Грунтовка глубокого проникновения, 10 л', gruntKan, 'кан.', P.grunt_10l, gruntKan * P.grunt_10l);
+  addRow(rows, total, 'Маяк профильный 10 мм, 3 м', mk.totalMayak, 'шт', P.mayak_3m, mk.totalMayak * P.mayak_3m);
+  addRow(rows, total, 'Уголок перфорированный ПУ, 3 м', mk.totalUgolok, 'шт', P.ugolok_3m, mk.totalUgolok * P.ugolok_3m);
+  addRow(rows, total, 'Серпянка стекловолоконная, рул. 50 м', serpRul, 'рул.', P.serpyanka_50m, serpRul * P.serpyanka_50m);
+
+  var rabota = S * SERVICES.ruchnaya.rabota;
+  var summary = 'Площадь стен: <b>' + S.toFixed(2) + ' м²</b> · Толщина слоя: <b>' + thick + ' мм</b> · Смеси: <b>' + fmt(Math.round(smesKg)) + ' кг (' + meshki30 + ' мешков)</b> · Вид: <b>Ручная гипсовая (Ротбанд)</b>';
+  renderResults(cards, rows, total[0], rabota, S, summary);
+}
+
+function calcTsementnaya(S, thick, perim, vysota) {
+  var smesKg    = parseFloat((S * (thick / 10) * 14).toFixed(1));
+  var meshki25  = Math.ceil(smesKg / 25);
+  var gruntL    = parseFloat((S * 0.15).toFixed(1));
+  var gruntKan  = Math.ceil(gruntL / 10);
+  var mk        = getMayakiUgolki(perim, vysota);
+
+  var cards = [];
+  cards.push(mkCard('Кнауф Унтерпутц', fmt(Math.round(smesKg)), 'кг', true, meshki25 + ' мешков × 25 кг'));
+  cards.push(mkCard('Тифендгрунд Кнауф', gruntL, 'л', false, gruntKan + ' кан. × 10 л'));
+  if (setkaTsOn) {
+    var setkaM2 = parseFloat((S * 1.1).toFixed(1));
+    cards.push(mkCard('Штукатурная сетка', setkaM2, 'м²', false, '+10% нахлёст'));
+  }
+  cards.push(mkCard('Маяки профильные 6 мм', mk.totalMayak, 'шт', false, mk.colCount + ' рядов · маяк 3 м'));
+  cards.push(mkCard('Уголки перфорир.', mk.totalUgolok, 'шт', false, '4 угла × ' + vysota.toFixed(1) + ' м'));
+
+  var rows = [], total = [0];
+  addRow(rows, total, 'Кнауф Унтерпутц / Зокельпутц, мешок 25 кг', meshki25, 'мешок', P.unterputz_25kg, meshki25 * P.unterputz_25kg);
+  addRow(rows, total, 'Тифендгрунд Кнауф, кан. 10 л', gruntKan, 'кан.', P.tifengrund_10l, gruntKan * P.tifengrund_10l);
+  if (setkaTsOn) {
+    var setkaM2 = parseFloat((S * 1.1).toFixed(1));
+    addRow(rows, total, 'Сетка штукатурная щелочестойкая, м²', Math.ceil(setkaM2), 'м²', P.shtuk_setka_m2, Math.ceil(setkaM2) * P.shtuk_setka_m2);
+  }
+  addRow(rows, total, 'Маяк профильный 6 мм, 3 м', mk.totalMayak, 'шт', P.mayak_3m, mk.totalMayak * P.mayak_3m);
+  addRow(rows, total, 'Уголок перфорированный ПУ, 3 м', mk.totalUgolok, 'шт', P.ugolok_3m, mk.totalUgolok * P.ugolok_3m);
+
+  var rabota = S * SERVICES.tsementnaya.rabota;
+  var setkaStr = setkaTsOn ? ' · Сетка: <b>да</b>' : '';
+  var summary = 'Площадь стен: <b>' + S.toFixed(2) + ' м²</b> · Толщина слоя: <b>' + thick + ' мм</b> · Смеси: <b>' + fmt(Math.round(smesKg)) + ' кг (' + meshki25 + ' мешков)</b>' + setkaStr;
+  renderResults(cards, rows, total[0], rabota, S, summary);
+}
+
+function calcMekhan(S, thick, perim, vysota) {
+  var smesKg    = parseFloat((S * (thick / 10) * 8.5).toFixed(1));
+  var meshki30  = Math.ceil(smesKg / 30);
+  var gruntL    = parseFloat((S * 0.15).toFixed(1));
+  var gruntKan  = Math.ceil(gruntL / 10);
+  var mk        = getMayakiUgolki(perim, vysota);
+
+  var cards = [];
+  cards.push(mkCard('Машинная штукатурка МП75', fmt(Math.round(smesKg)), 'кг', true, meshki30 + ' мешков × 30 кг'));
+  cards.push(mkCard('Грунтовка ГП', gruntL, 'л', false, gruntKan + ' кан. × 10 л'));
+  cards.push(mkCard('Маяки профильные', mk.totalMayak, 'шт', false, mk.colCount + ' рядов · маяк 3 м'));
+  cards.push(mkCard('Уголки перфорир.', mk.totalUgolok, 'шт', false, '4 угла × ' + vysota.toFixed(1) + ' м'));
+
+  var rows = [], total = [0];
+  addRow(rows, total, 'Штукатурка машинная Кнауф МП75, мешок 30 кг', meshki30, 'мешок', P.mp75_30kg, meshki30 * P.mp75_30kg);
+  addRow(rows, total, 'Грунтовка глубокого проникновения, 10 л', gruntKan, 'кан.', P.grunt_10l, gruntKan * P.grunt_10l);
+  addRow(rows, total, 'Маяк профильный 10 мм, 3 м', mk.totalMayak, 'шт', P.mayak_3m, mk.totalMayak * P.mayak_3m);
+  addRow(rows, total, 'Уголок перфорированный ПУ, 3 м', mk.totalUgolok, 'шт', P.ugolok_3m, mk.totalUgolok * P.ugolok_3m);
+
+  var rabota = S * SERVICES.mekhan.rabota;
+  var summary = 'Площадь стен: <b>' + S.toFixed(2) + ' м²</b> · Толщина слоя: <b>' + thick + ' мм</b> · Смеси: <b>' + fmt(Math.round(smesKg)) + ' кг (' + meshki30 + ' мешков)</b> · Вид: <b>Механизированная (МП75)</b>';
+  renderResults(cards, rows, total[0], rabota, S, summary);
+}
+
+function calcKoroyed(S, perim, vysota) {
+  var rashod    = zernoVal === 2 ? 2.5 : 3.2;
+  var smesKg    = parseFloat((S * rashod).toFixed(1));
+  var meshki25  = Math.ceil(smesKg / 25);
+  var kvGruntKg = parseFloat((S * 0.25).toFixed(1));
+  var kvGruntUp = Math.ceil(kvGruntKg / 7);
+  var voskKg    = Math.max(1, Math.ceil(S * 0.1));
+
+  var cards = [];
+  cards.push(mkCard('Декоративная штукатурка Короед', fmt(Math.round(smesKg)), 'кг', true, meshki25 + ' мешков × 25 кг · зерно ' + zernoVal + ' мм'));
+  cards.push(mkCard('Кварцевый грунт', kvGruntKg, 'кг', false, kvGruntUp + ' уп. × 7 кг'));
+  cards.push(mkCard('Воск финишный', voskKg, 'кг', false, voskKg + ' уп. × 1 кг'));
+
+  var rows = [], total = [0];
+  addRow(rows, total, 'Декоративная штукатурка Короед зерно ' + zernoVal + ' мм, мешок 25 кг', meshki25, 'мешок', P.koroyed_25kg, meshki25 * P.koroyed_25kg);
+  addRow(rows, total, 'Кварцевый грунт-концентрат, уп. 7 кг', kvGruntUp, 'уп.', P.kvarts_grunt_7kg, kvGruntUp * P.kvarts_grunt_7kg);
+  addRow(rows, total, 'Воск защитный финишный, уп. 1 кг', voskKg, 'уп.', P.vosk_1kg, voskKg * P.vosk_1kg);
+
+  var rabota = S * SERVICES.koroyed.rabota;
+  var summary = 'Площадь стен: <b>' + S.toFixed(2) + ' м²</b> · Зерно: <b>' + zernoVal + ' мм</b> · Расход: <b>' + rashod + ' кг/м²</b> · Смеси: <b>' + fmt(Math.round(smesKg)) + ' кг (' + meshki25 + ' мешков)</b>';
+  renderResults(cards, rows, total[0], rabota, S, summary);
+}
+
+/* ===== ТЕХНОЛОГИЯ И ТЕХНАДЗОР ===== */
+var TECH_DATA = {
+  ruchnaya: { title: 'Технология: ручная гипсовая штукатурка', steps: [
+    ['Подготовка основания', 'Очистить стены от пыли, жира, отслоений. Срубить выступы. Трещины расшить шпателем и заделать ремсоставом. Убрать старую краску или плёнку.', 'Шпатель, перфоратор, щётка, ремсостав'],
+    ['Грунтование', 'Нанести грунтовку глубокого проникновения валиком или кистью — 1–2 слоя без пропусков. Сушка между слоями 1–2 ч. Гипсовая штукатурка требует хорошего сцепления.', 'Грунтовка ГП, валик, кисть'],
+    ['Установка угловых профилей', 'На все наружные углы установить перфорированные уголки ПУ на гипсовый раствор. Выровнять по уровню. Дать схватиться 1–2 ч.', 'Уголки ПУ, гипсовый раствор, уровень'],
+    ['Установка маяков', 'Закрепить профильные маяки 10 мм вертикально по уровню с шагом 1,0–1,2 м. Фиксация на «ляпухах» из смеси. Выдержать 2–3 ч до схватывания.', 'Маяки 3 м, лазерный/пузырьковый уровень'],
+    ['Клейка серпянки', 'На швы между блоками и стыки конструкций приклеить серпянку — предотвращает трещины. Клеить на первый слой штукатурки пока влажная.', 'Серпянка стекловолоконная, шпатель'],
+    ['Замешивание раствора', 'Засыпать смесь в воду (~0,55 л/кг). Перемешать миксером 3–5 мин до однородной пластичной массы. Выдержать 2–3 мин, снова перемешать. Использовать в течение 40–50 мин.', 'Дрель-миксер, ёмкость ≥ 30 л'],
+    ['Нанесение и выравнивание', 'Набросить шпателем или соколом первый слой, разровнять правилом по маякам снизу вверх зигзагообразными движениями. Толщина слоя до 30 мм.', 'Сокол, шпатель, правило ≥ 1.5 м'],
+    ['Затирка и заглаживание', 'Через 30–40 мин (пока схватывается) затереть поверхность влажным соколом или тёркой круговыми движениями. Финишное заглаживание стальным шпателем.', 'Тёрка, стальной шпатель, вода'],
+    ['Демонтаж маяков', 'Через 48–72 ч извлечь маяки. Борозды заполнить смесью, затереть вровень с плоскостью.', 'Нож, шпатель, смесь Ротбанд'],
+    ['Сушка', 'Не допускать сквозняков и прямых солнечных лучей минимум 7 суток. При T° ниже +10°C работы не проводить. Полная прочность — 28 суток.', 'Плёнка п/э (при необходимости)']
+  ]},
+  tsementnaya: { title: 'Технология: цементная штукатурка Кнауф', steps: [
+    ['Подготовка основания', 'Очистить стены от пыли, масла, отслоений. На кирпиче — расшить швы на 5–7 мм щёткой или перфоратором. Трещины расшить и заделать ремсоставом.', 'Перфоратор, жёсткая щётка, ремсостав'],
+    ['Обработка гладкого бетона', 'Если основание — гладкий бетон (заводская плита, монолит), снять глянцевый слой алмазными чашами УШМ. Затем нанести Кнауф Адгезив кистью — создаёт шероховатую адгезионную поверхность. Сушка 2–4 ч.', 'УШМ с алмазной чашей, Кнауф Адгезив, кисть'],
+    ['Грунтование Тифендгрунд', 'Нанести Тифендгрунд Кнауф валиком или кистью равномерно без пропусков — 1 слой. Сушка 2–4 ч. Укрепляет слабые основания, снижает водопоглощение.', 'Тифендгрунд Кнауф, валик, кисть'],
+    ['Штукатурная сетка (при необходимости)', 'При наличии трещин, стыков разных материалов или слое > 20 мм — закрепить щелочестойкую стеклосетку дюбелями-"грибками". Нахлёст полотен ≥ 100 мм.', 'Штукатурная сетка, дюбели-"грибки"'],
+    ['Установка угловых профилей', 'На все наружные углы установить перфорированные уголки ПУ на раствор Унтерпутц. Выровнять по вертикальному уровню. Дать схватиться 4–6 ч.', 'Уголки ПУ, Унтерпутц, уровень'],
+    ['Установка маяков 6 мм', 'Закрепить маяки 6 мм вертикально по уровню с шагом 1,0–1,2 м на «ляпухах» из раствора. Выставить по лазерному уровню. Дать схватиться 4–6 ч.', 'Маяки 6 мм, 3 м; лазерный уровень'],
+    ['Смачивание основания', 'Перед нанесением обильно смочить основание водой — предотвращает быстрое обезвоживание раствора и трещины при сушке.', 'Опрыскиватель или валик с водой'],
+    ['Приготовление раствора Унтерпутц', 'Засыпать смесь в воду (~0,18–0,20 л/кг). Перемешать миксером 3–5 мин до однородности. Консистенция — сметана средней густоты. Использовать в течение 1,5–2 ч.', 'Дрель-миксер, ёмкость ≥ 40 л'],
+    ['Нанесение набрасыванием', 'Набрасывать раствор ковшом или мастерком с силой для плотного контакта. Первый слой (обрызг) — жидкий, 4–5 мм, заполняет все поры. Основной слой — до маяков.', 'Ковш, кельма, мастерок'],
+    ['Выравнивание правилом', 'Разровнять слой правилом по маякам снизу вверх зигзагообразными движениями. При обнаружении пустот — добавить раствор и повторить.', 'Правило ≥ 2 м, полутёрок'],
+    ['Затирка и уход', 'Через 6–8 ч (пока схватывается) затереть тёркой. Увлажнять поверхность 2–3 раза в сутки 7 суток. Демонтировать маяки через 72 ч, борозды заделать смесью.', 'Тёрка, опрыскиватель с водой']
+  ]},
+  mekhan: { title: 'Технология: механизированная штукатурка', steps: [
+    ['Подготовка основания', 'Очистить поверхности от пыли, масляных пятен, отслоений. Срубить острые выступы. Заделать крупные раковины и трещины ремсоставом.', 'Перфоратор, щётка, ремсостав'],
+    ['Грунтование', 'Нанести грунтовку глубокого проникновения валиком — 1 слой равномерно. Сушка 1–2 ч. Обеспечивает сцепление и снижает водопоглощение основания.', 'Грунтовка ГП, валик'],
+    ['Установка угловых профилей', 'Закрепить перфорированные уголки на все наружные углы. Выровнять по уровню. Дать схватиться перед нанесением смеси.', 'Уголки ПУ, гипсовый раствор, уровень'],
+    ['Установка маяков', 'Маяки по вертикали с шагом 1,0–1,2 м. При работе с современными станциями допустимо использование лазерных направляющих вместо физических маяков.', 'Маяки 3 м, лазерный уровень'],
+    ['Подготовка станции', 'Загрузить мешки в бункер машины. Настроить соотношение смесь/вода согласно инструкции (примерно 0,55 л/кг). Промыть шланги перед началом.', 'Штукатурная машина (PFT, Kaleta и др.)'],
+    ['Механизированное нанесение', 'Подавать смесь машиной равномерными горизонтальными полосами снизу вверх. Держать форсунку на расстоянии 30–40 см от стены под углом 90°. 1 проход = до 30 мм.', 'Машина, шланг, форсунка'],
+    ['Разравнивание правилом', 'Пока смесь пластична (5–15 мин после нанесения), разровнять правилом по маякам зигзагообразными движениями снизу вверх. Убрать излишки.', 'Правило ≥ 1.5 м, полутёрок'],
+    ['Затирка', 'Через 30–60 мин (в зависимости от T° и влажности) затереть тёркой или затирочной машиной до гладкой ровной поверхности. Мочить тёрку при необходимости.', 'Тёрка, затирочная машина, вода'],
+    ['Демонтаж маяков и уход', 'Через 48–72 ч извлечь маяки, заделать борозды. Не допускать сквозняков и пересыхания 7 суток. При T° < +10°C — не работать.', 'Шпатель, смесь МП75, плёнка']
+  ]},
+  koroyed: { title: 'Технология: декоративная штукатурка Короед', steps: [
+    ['Подготовка основания', 'Основание должно быть прочным, ровным (неровности ≤ 3 мм/2 м), сухим, без пыли и жира. При необходимости предварительно выровнять базовой шпаклёвкой или штукатуркой.', 'Правило 2 м, шпатель, шлифмашина'],
+    ['Нанесение кварцевого грунта', 'Кварцевый грунт-концентрат нанести валиком или кистью 1 слоем равномерно. Создаёт шероховатость для лучшего сцепления. Сушка 2–4 ч до полного высыхания.', 'Кварцевый грунт, валик с коротким ворсом'],
+    ['Подбор цвета', 'Колеровать смесь в заводских условиях или добавить колер на основе акрила. Для одного помещения использовать только одну партию — оттенки могут отличаться.', 'Колер акриловый, дрель-миксер'],
+    ['Приготовление смеси', 'Перемешать готовую смесь дрелью-миксером до однородности. Не добавлять воду. Рабочая температура: +5°С … +30°С. Открытое время — 2–4 ч.', 'Дрель-миксер, ёмкость'],
+    ['Нанесение первого слоя', 'Нанести смесь нержавеющей кельмой тонким слоем, равным размеру зерна (2 или 3 мм). Движения сверху вниз, равномерное давление. Обработать захватку 1–2 м² до начала формирования фактуры.', 'Нержавеющая кельма 30–40 см'],
+    ['Формирование фактуры "Короед"', 'Когда слой начинает тянуться (5–10 мин), затереть пластиковой тёркой круговыми движениями — создаются характерные бороздки. Степень нажима определяет выраженность рисунка.', 'Пластиковая тёрка, губка'],
+    ['Стыковка захваток', 'Следующую захватку начинать пока предыдущая ещё не схватилась — граница должна быть мокрой. Стык затереть единым движением тёрки для однородной фактуры.', 'Пластиковая тёрка, широкая кельма'],
+    ['Сушка', 'Не допускать прямого солнца, дождя и сквозняков минимум 24–48 ч. При +20°С и влажности 60% — полное высыхание 24 ч, полная прочность — 7 суток.', 'Укрывная плёнка, закрытые окна'],
+    ['Финишное покрытие воском', 'Нанести защитный воск губкой или кельмой круговыми движениями тонким слоем. Полировать после частичного высыхания (10–15 мин) чистой тканью. Воск защищает от влаги и облегчает уборку.', 'Воск финишный, губка, мягкая ткань']
+  ]}
+};
+
+var CTRL_DATA = {
+  ruchnaya: { title: 'Технадзор: ручная гипсовая штукатурка', rows: [
+    ['До начала', 'Прочность основания', 'Нет глухого звука, не крошится', 'Молоток, простукивание'],
+    ['До начала', 'Влажность основания', '≤ 8% (гипс чувствителен к влаге)', 'Влагомер или плёнка 1×1 м на 24 ч'],
+    ['Грунтование', 'Равномерность покрытия', 'Нет пропусков, поверхность потемнела', 'Визуально'],
+    ['Маяки', 'Вертикальность', 'Отклонение ≤ 1 мм/1 м', 'Уровень 1–2 м или лазер'],
+    ['Маяки', 'Шаг маяков', '≤ (длина правила − 200 мм)', 'Рулетка'],
+    ['Раствор', 'Консистенция', 'Пластичная масса, держит форму на шпателе', 'Шпатель — тест "сползания"'],
+    ['Нанесение', 'Нет пустот под слоем', 'Плотный звук при простукивании', 'Рукоятка шпателя, простукивание'],
+    ['1 сутки', 'Ровность поверхности', 'Просвет под 2 м рейкой ≤ 3 мм', 'Правило 2 м + клинья'],
+    ['7 суток', 'Прочность и цвет', 'Равномерно белый/серый, звонкий звук', 'Визуально, монета не царапает'],
+    ['28 суток', 'Влажность перед финишем', '≤ 5% перед шпаклёвкой, ≤ 3% перед плиткой', 'Влагомер CM']
+  ]},
+  tsementnaya: { title: 'Технадзор: цементная штукатурка Кнауф', rows: [
+    ['До начала', 'Прочность основания', 'Не крошится, ≥ М50', 'Простукивание, царапание ключом'],
+    ['До начала', 'Влажность основания', '≤ 5%', 'Влагомер или плёнка на 24 ч'],
+    ['Подготовка бетона', 'Снят глянцевый слой', 'Поверхность матовая, шероховатая на ощупь', 'Визуально, провести рукой'],
+    ['Кнауф Адгезив', 'Равномерность покрытия', 'Зернистая поверхность без пропусков, высохла', 'Визуально, тест на отлип'],
+    ['Тифендгрунд', 'Равномерность и высыхание', 'Нет пропусков, поверхность потемнела и высохла', 'Визуально, 2–4 ч'],
+    ['Маяки 6 мм', 'Вертикальность', 'Отклонение ≤ 1 мм/1 м', 'Уровень или лазер'],
+    ['Сетка (если есть)', 'Нахлёст и крепление', 'Нахлёст ≥ 100 мм, без провисания', 'Рулетка, визуально'],
+    ['Раствор', 'Подвижность', 'Не стекает с перевёрнутого шпателя', 'Шпатель — тест адгезии'],
+    ['Нанесение', 'Адгезия обрызга', 'Плотный звук, нет отслоений', 'Простукивание'],
+    ['3 суток', 'Ровность', 'Просвет ≤ 4 мм/2 м (под плитку: ≤ 2 мм)', 'Правило 2 м + клинья'],
+    ['28 суток', 'Прочность', 'Звонкий звук, монета не царапает', 'Монета, молоток, склерометр'],
+    ['28 суток', 'Влажность', '≤ 6% под отделку', 'Влагомер CM']
+  ]},
+  mekhan: { title: 'Технадзор: механизированная штукатурка', rows: [
+    ['До начала', 'Прочность и влажность основания', 'Нет отслоений, влажность ≤ 8%', 'Молоток, влагомер'],
+    ['Машина', 'Соотношение смесь/вода', 'По инструкции, тест на консистенцию', 'Визуально — сползает с шпателя ~3 сек'],
+    ['Нанесение', 'Равномерность слоя', 'Нет непокрытых мест, пузырей', 'Визуально после нанесения'],
+    ['Нанесение', 'Толщина слоя', '≤ 30 мм за проход', 'Игла-щуп, маяки'],
+    ['Правило', 'Отсутствие пустот', 'Плотный звук при простукивании', 'Рукоятка шпателя'],
+    ['Затирка', 'Время начала', 'Начинать при следе от пальца без налипания', 'Тест пальцем'],
+    ['1 сутки', 'Ровность', 'Просвет ≤ 3 мм/2 м', 'Правило 2 м + клинья'],
+    ['7 суток', 'Прочность', 'Не царапается ногтем, звонкий звук', 'Монета, молоток'],
+    ['28 суток', 'Влажность перед финишем', '≤ 5%', 'Влагомер CM']
+  ]},
+  koroyed: { title: 'Технадзор: штукатурка Короед', rows: [
+    ['До начала', 'Ровность основания', 'Неровности ≤ 3 мм/2 м', 'Правило 2 м + клинья'],
+    ['До начала', 'Прочность основания', 'Не крошится, нет отслоений', 'Простукивание, царапание шпателем'],
+    ['Грунт', 'Высыхание кварцевого грунта', 'Полностью сухой, не липнет к ладони', 'Ладонью — тест на липкость'],
+    ['Смесь', 'Консистенция', 'Без комков, однородная, не течёт', 'Визуально, тест на шпателе'],
+    ['Нанесение', 'Толщина слоя', 'Равна диаметру зерна ± 0.5 мм', 'Игла-щуп'],
+    ['Нанесение', 'Целостность слоя', 'Нет пропусков, пузырей, непрокрасов', 'Визуально при рассеянном свете'],
+    ['Фактура', 'Единообразие рисунка', 'Одинаковая плотность борозд по всей стене', 'Визуально под углом к свету'],
+    ['Стыки', 'Видимость границ захваток', 'Стыки не видны при правильной технике', 'Визуально при косом свете'],
+    ['24 ч', 'Адгезия к основанию', 'Нет отслоения при лёгком простукивании', 'Рукоятка шпателя'],
+    ['7 суток', 'Воск / финишное покрытие', 'Равномерный блеск, нет пропусков', 'Визуально, тест водой (капля скатывается)']
+  ]}
+};
+
+function renderInfoTables(svcType) {
+  var tech = TECH_DATA[svcType], ctrl = CTRL_DATA[svcType];
+  document.getElementById('tech-title').textContent = tech.title;
+  document.getElementById('tech-tbody').innerHTML = tech.steps.map(function(s, i) {
+    var bg = i % 2 === 0 ? '#ffffff' : '#f9f9fb';
+    return '<tr style="background:' + bg + ';border-bottom:1px solid #eeeef0">' +
+      '<td style="padding:14px 16px;font-size:16px;font-weight:900;color:#c0001a;vertical-align:top;white-space:nowrap">' + String(i + 1).padStart(2, '0') + '</td>' +
+      '<td style="padding:14px 12px;font-weight:700;vertical-align:top;line-height:1.4">' + s[0] + '</td>' +
+      '<td style="padding:14px 12px;color:#5c3f3d;font-size:13px;vertical-align:top;line-height:1.5">' + s[1] + '</td>' +
+      '<td style="padding:14px 16px;color:#916f6c;font-style:italic;font-size:13px;vertical-align:top;line-height:1.4">' + s[2] + '</td>' +
+      '</tr>';
+  }).join('');
+  document.getElementById('ctrl-title').textContent = ctrl.title;
+  document.getElementById('ctrl-tbody').innerHTML = ctrl.rows.map(function(r, i) {
+    var bg = i % 2 === 0 ? '#ffffff' : '#f9f9fb';
+    return '<tr style="background:' + bg + ';border-bottom:1px solid #eeeef0">' +
+      '<td style="padding:12px 16px;font-weight:700">' + r[0] + '</td>' +
+      '<td style="padding:12px 12px">' + r[1] + '</td>' +
+      '<td style="padding:12px 12px;font-weight:600;color:#1a1c1d">' + r[2] + '</td>' +
+      '<td style="padding:12px 16px;font-style:italic;color:#5c3f3d">' + r[3] + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+renderInfoTables('ruchnaya');
+</script>
+</body>
+</html>

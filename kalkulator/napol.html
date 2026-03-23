@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор напольных покрытий</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          "primary":                    "#930011",
+          "primary-container":          "#c0001a",
+          "on-primary":                 "#ffffff",
+          "surface":                    "#ffffff",
+          "surface-dim":                "#d9dadc",
+          "surface-variant":            "#e2e2e4",
+          "surface-container":          "#eeeef0",
+          "surface-container-low":      "#f3f3f5",
+          "surface-container-high":     "#e8e8ea",
+          "surface-container-highest":  "#e2e2e4",
+          "surface-container-lowest":   "#efefef",
+          "on-surface":                 "#1a1c1d",
+          "on-surface-variant":         "#5c3f3d",
+          "outline":                    "#916f6c",
+          "outline-variant":            "#e6bdb9",
+          "tertiary":                   "#004880",
+          "tertiary-container":         "#0060a8",
+          "on-tertiary":                "#ffffff",
+        },
+        fontFamily: { sans: ["Manrope", "sans-serif"] }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px; display: inline-block; line-height: 1;
+    letter-spacing: normal; word-wrap: normal; white-space: nowrap;
+    direction: ltr; vertical-align: middle;
+  }
+  body { font-family: 'Manrope', sans-serif; min-height: 100dvh; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type="number"] { -moz-appearance: textfield; }
+  .custom-scrollbar::-webkit-scrollbar { height: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: #f3f3f5; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #c0001a; border-radius: 10px; }
+  input[type="range"] { -webkit-appearance:none; appearance:none; appearance:none; height:6px; border-radius:4px; background:#e2e2e4; outline:none; cursor:pointer; width:100%; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; height:26px; border-radius:50%; background:#c0001a; cursor:pointer; box-shadow:0 2px 8px rgba(192,0,26,0.35); }
+  input[type="range"]::-moz-range-thumb { width:26px; height:26px; border-radius:50%; background:#c0001a; cursor:pointer; border:none; box-shadow:0 2px 8px rgba(192,0,26,0.35); }
+  @media (min-width: 1024px) {
+    .main-grid { display: grid; grid-template-columns: minmax(0,420px) minmax(0,1fr); gap: 2rem; align-items: start; }
+    .col-left { position: sticky; top: 72px; }
+  }
+  @media (min-width: 1280px) { .main-grid { grid-template-columns: minmax(0,460px) minmax(0,1fr); } }
+  .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+  button, a { touch-action: manipulation; }
+  @media print {
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    header, .col-left, #print-btn, #tech-arrow, #ctrl-arrow,
+    #print-header, #summary-bar, #cards-grid,
+    #results > .flex, #results > section:first-of-type, .lg\\:hidden { display: none !important; }
+    #tech-body, #ctrl-body { display: block !important; }
+    body { background: #fff !important; padding: 0; margin: 0; font-size: 11pt; }
+    main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    .main-grid { display: block !important; }
+    #results { display: block !important; }
+    #print-header { display: flex !important; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #c0001a; padding-bottom: 8px; margin-bottom: 16px; }
+    #print-header h1 { font-size: 16pt; font-weight: 900; color: #c0001a; margin: 0; }
+    #print-header p { font-size: 10pt; color: #555; margin: 2px 0 0; }
+    #print-header .print-meta { text-align: right; font-size: 9pt; color: #777; }
+    table { width: 100% !important; border-collapse: collapse !important; min-width: unset !important; font-size: 9.5pt !important; }
+    th { background: #f0f0f2 !important; color: #333 !important; border: 1px solid #ccc !important; padding: 5px 8px !important; text-align: left !important; font-size: 8.5pt !important; }
+    td { border: 1px solid #ddd !important; padding: 5px 8px !important; vertical-align: top !important; }
+    tr:nth-child(even) td { background: #fafafa !important; }
+    tfoot td { font-weight: 900 !important; background: #f5f5f7 !important; border-top: 2px solid #999 !important; }
+    .bg-on-surface, .bg-tertiary-container { background: #333 !important; color: #fff !important; padding: 6px 10px !important; border-radius: 4px 4px 0 0 !important; }
+    .overflow-x-auto { overflow: visible !important; }
+  }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased pb-8">
+
+<header class="bg-gradient-to-br from-red-700 to-red-600 shadow-lg shadow-red-900/20 sticky top-0 z-50">
+  <div class="relative flex items-stretch max-w-screen-xl mx-auto" style="min-height:64px">
+    <div class="flex items-center px-5 py-3">
+      <img src="logo_1.svg" alt="Логотип" style="height:42px;width:auto;filter:brightness(0) invert(1);">
+    </div>
+    <div class="flex-1 flex items-center justify-center">
+      <p id="header-sub" class="text-white font-extrabold text-sm uppercase tracking-wider text-center leading-tight">Ламинат</p>
+    </div>
+    <div class="flex items-center px-4">
+      <button class="text-white/70 hover:text-white transition-opacity active:scale-95 p-1">
+        <span class="material-symbols-outlined">share</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+  <div class="main-grid">
+
+    <div class="col-left space-y-5">
+
+      <!-- Вид покрытия -->
+      <section>
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Вид покрытия</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2.5">
+          <button id="svc-laminat" onclick="setService('laminat')"
+            class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-[0.97] border-primary-container bg-red-50">
+            <span class="text-2xl leading-none">&#129717;</span>
+            <span class="text-xs font-bold text-primary leading-tight text-center">Ламинат</span>
+          </button>
+          <button id="svc-kvartsvinil" onclick="setService('kvartsvinil')"
+            class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#128160;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Кварцвинил</span>
+          </button>
+          <button id="svc-linoleum" onclick="setService('linoleum')"
+            class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#127754;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Линолеум</span>
+          </button>
+          <button id="svc-keramogranit" onclick="setService('keramogranit')"
+            class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#129521;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Керамогранит</span>
+          </button>
+          <button id="svc-parket" onclick="setService('parket')"
+            class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#127795;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Паркет штучный</span>
+          </button>
+          <button id="svc-inzh_doska" onclick="setService('inzh_doska')"
+            class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#129718;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Инженерная доска</span>
+          </button>
+          <button id="svc-drev_plity" onclick="setService('drev_plity')"
+            class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#128230;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Древесные плиты</span>
+          </button>
+          <button id="svc-epoxi" onclick="setService('epoxi')"
+            class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-[0.97] border-surface-container-high bg-surface-container-lowest">
+            <span class="text-2xl leading-none">&#128167;</span>
+            <span class="text-xs font-bold text-on-surface-variant leading-tight text-center">Эпоксидный пол</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Размеры помещения -->
+      <section class="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-4">Размеры помещения</p>
+        <div class="input-grid grid grid-cols-3 gap-2 sm:gap-3">
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-bold text-on-surface-variant">Длина, м</label>
+            <input type="number" id="dlina" placeholder="5.0" min="0.5" max="100" step="0.1" inputmode="decimal"
+              oninput="updateArea()"
+              class="px-2 sm:px-3 py-3 rounded-xl border-2 border-surface-container-high bg-surface-container-low text-on-surface font-bold text-[14px] focus:border-primary-container focus:outline-none transition-colors w-full">
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-bold text-on-surface-variant">Ширина, м</label>
+            <input type="number" id="shirina" placeholder="4.0" min="0.5" max="100" step="0.1" inputmode="decimal"
+              oninput="updateArea()"
+              class="px-2 sm:px-3 py-3 rounded-xl border-2 border-surface-container-high bg-surface-container-low text-on-surface font-bold text-[14px] focus:border-primary-container focus:outline-none transition-colors w-full">
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[11px] font-bold text-on-surface-variant">Площадь</label>
+            <div id="area-badge" class="px-2 py-3 rounded-xl bg-red-50 border-2 border-red-200 text-primary-container font-black text-[14px] min-h-[50px] flex items-center leading-tight">— м²</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Способ укладки: кварцвинил -->
+      <div id="sec-kv-type" style="display:none">
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Способ укладки</p>
+        <div class="grid grid-cols-2 gap-2 p-1.5 bg-surface-container rounded-xl">
+          <button id="btn-kv-zamok" onclick="setKvType('zamok')"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] bg-primary-container text-white shadow-sm">
+            Замковый
+          </button>
+          <button id="btn-kv-klej" onclick="setKvType('klej')"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] text-on-surface-variant">
+            На клей
+          </button>
+        </div>
+        <p id="kv-hint" class="text-[11px] text-on-surface-variant mt-2 px-1">Подложка + замковое соединение · без клея · быстрый монтаж</p>
+      </div>
+
+      <!-- Способ укладки: линолеум -->
+      <div id="sec-lino-type" style="display:none">
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Способ укладки</p>
+        <div class="grid grid-cols-2 gap-2 p-1.5 bg-surface-container rounded-xl">
+          <button id="btn-lino-svobod" onclick="setLinoType('svobod')"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] bg-primary-container text-white shadow-sm">
+            Свободная
+          </button>
+          <button id="btn-lino-klej" onclick="setLinoType('klej')"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] text-on-surface-variant">
+            На клей
+          </button>
+        </div>
+        <p id="lino-hint" class="text-[11px] text-on-surface-variant mt-2 px-1">Без фиксации · прижимается плинтусами и мебелью</p>
+      </div>
+
+      <!-- Направление укладки: керамогранит -->
+      <div id="sec-plat-diag" style="display:none">
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Направление укладки</p>
+        <div class="grid grid-cols-2 gap-2 p-1.5 bg-surface-container rounded-xl">
+          <button id="btn-pryam" onclick="setPlatDiag(false)"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] bg-primary-container text-white shadow-sm">
+            Прямая (+10%)
+          </button>
+          <button id="btn-diag" onclick="setPlatDiag(true)"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] text-on-surface-variant">
+            Диагональ (+15%)
+          </button>
+        </div>
+        <p id="diag-hint" class="text-[11px] text-on-surface-variant mt-2 px-1">Прямая укладка — стандарт · диагональ требует больше отходов</p>
+      </div>
+
+      <!-- Способ укладки: инженерная доска -->
+      <div id="sec-inzh-type" style="display:none">
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Способ укладки</p>
+        <div class="grid grid-cols-2 gap-2 p-1.5 bg-surface-container rounded-xl">
+          <button id="btn-inzh-zamok" onclick="setInzhType('zamok')"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] bg-primary-container text-white shadow-sm">
+            Замковый
+          </button>
+          <button id="btn-inzh-klej" onclick="setInzhType('klej')"
+            class="py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97] text-on-surface-variant">
+            На клей
+          </button>
+        </div>
+        <p id="inzh-hint" class="text-[11px] text-on-surface-variant mt-2 px-1">Замковый — на подложку · На клей — прямо на основание</p>
+      </div>
+
+      <!-- Тип плиты -->
+      <div id="sec-plita-type" style="display:none">
+        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Тип плиты</p>
+        <div class="grid grid-cols-3 gap-2 p-1.5 bg-surface-container rounded-xl">
+          <button id="btn-fanera" onclick="setPlitaType('fanera')"
+            class="py-2.5 rounded-xl font-bold text-sm transition-all active:scale-[0.97] bg-primary-container text-white shadow-sm">
+            Фанера
+          </button>
+          <button id="btn-osb" onclick="setPlitaType('osb')"
+            class="py-2.5 rounded-xl font-bold text-sm transition-all active:scale-[0.97] text-on-surface-variant">
+            ОСБ-3
+          </button>
+          <button id="btn-csp" onclick="setPlitaType('csp')"
+            class="py-2.5 rounded-xl font-bold text-sm transition-all active:scale-[0.97] text-on-surface-variant">
+            ЦСП
+          </button>
+        </div>
+        <p id="plita-hint" class="text-[11px] text-on-surface-variant mt-2 px-1">Фанера ФСФ 18 мм · 1525×1525 мм · влагостойкая</p>
+      </div>
+
+      <!-- Эпоксидный пол: толщина + наполнитель -->
+      <div id="sec-epoxi" style="display:none" class="space-y-4">
+        <section class="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Толщина покрытия</p>
+            <div id="epoxi-thick-val" class="px-3 py-1 bg-red-50 border-2 border-primary-container rounded-full text-primary-container font-black text-sm">2 мм</div>
+          </div>
+          <input type="range" id="epoxi-thick" min="1" max="5" value="2" step="1" oninput="document.getElementById('epoxi-thick-val').textContent=this.value+' мм'">
+          <p class="text-[11px] text-on-surface-variant mt-3 leading-relaxed">1–2 мм: финишный слой · 3–5 мм: нагруженные коммерческие полы</p>
+        </section>
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-3">Наполнитель</p>
+          <button id="epoxi-kvars-field" onclick="toggleEpoxiKvars()"
+            class="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-surface-container-high bg-surface-container-lowest transition-all active:scale-[0.98]">
+            <div id="epoxi-kvars-box" class="w-6 h-6 rounded-lg border-2 border-outline flex items-center justify-center flex-shrink-0 transition-all">
+              <span id="epoxi-kvars-icon" class="material-symbols-outlined text-white" style="font-size:16px;display:none">check</span>
+            </div>
+            <span id="epoxi-kvars-text" class="text-sm font-semibold text-on-surface-variant text-left leading-snug">Кварцевый наполнитель (антискользящий)</span>
+          </button>
+          <p class="text-[11px] text-on-surface-variant mt-2 px-1">Посыпка кварцевым песком в базовый слой — повышает прочность и сцепление</p>
+        </div>
+      </div>
+
+      <!-- Кнопка расчёта -->
+      <button onclick="calculate()"
+        class="w-full bg-gradient-to-br from-primary to-primary-container text-white font-black py-5 rounded-xl shadow-lg shadow-red-900/25 active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-wider">
+        <span class="material-symbols-outlined">calculate</span>
+        Рассчитать материалы и стоимость
+      </button>
+
+    </div><!-- /col-left -->
+
+    <div class="space-y-5 mt-5 lg:mt-0">
+
+      <div id="print-header" style="display:none">
+        <div>
+          <img src="logo_2.svg" alt="Логотип" style="height:40px;width:auto;margin-bottom:6px;display:block;">
+          <h1 id="print-title">Смета: напольное покрытие</h1>
+          <p id="print-sub">Ламинат</p>
+        </div>
+        <div class="print-meta">
+          <div id="print-area-info"></div>
+          <div id="print-date"></div>
+        </div>
+      </div>
+
+      <div id="results" style="display:none" class="space-y-5">
+        <div class="flex justify-end">
+          <button id="print-btn" onclick="window.print()"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-on-surface text-white font-bold text-sm hover:opacity-90 active:scale-[0.97] transition-all shadow-sm">
+            <span class="material-symbols-outlined" style="font-size:18px">print</span>
+            Распечатать смету
+          </button>
+        </div>
+        <section>
+          <h2 class="font-extrabold text-xl tracking-tight mb-4">Количество материалов</h2>
+          <div id="cards-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+        </section>
+        <div id="summary-bar" class="p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500 text-sm text-blue-700 leading-relaxed font-medium"></div>
+        <section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+          <div class="px-4 py-4 bg-surface-container-low border-b border-surface-container">
+            <h2 class="font-extrabold text-base uppercase tracking-tight">Смета материалов и работ</h2>
+          </div>
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-[13px] border-collapse" style="min-width:380px">
+              <thead>
+                <tr class="bg-surface-container-high text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
+                  <th class="px-4 py-3">Материал</th>
+                  <th class="px-3 py-3 text-right">Кол-во</th>
+                  <th class="px-3 py-3">Ед.</th>
+                  <th class="px-3 py-3 text-right">Цена</th>
+                  <th class="px-4 py-3 text-right">Сумма</th>
+                </tr>
+              </thead>
+              <tbody id="price-tbody"></tbody>
+              <tfoot id="price-tfoot"></tfoot>
+            </table>
+          </div>
+          <p class="text-[11px] text-on-surface-variant/60 text-right px-4 py-2">* Цены ориентировочные, рыночные 2026 г.</p>
+        </section>
+      </div>
+
+      <!-- Технология работ -->
+      <section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <button onclick="toggleSection('tech-body')" class="w-full bg-on-surface px-4 py-4 flex items-center gap-3 text-left">
+          <span class="material-symbols-outlined text-white">construction</span>
+          <h3 id="tech-title" class="text-white font-extrabold text-sm uppercase tracking-wider flex-1">Технология работ</h3>
+          <span id="tech-arrow" class="material-symbols-outlined text-white transition-transform duration-200" style="font-size:20px">expand_more</span>
+        </button>
+        <div id="tech-body" style="display:none">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-sm border-collapse" style="min-width:500px">
+              <thead>
+                <tr class="bg-surface-container-low text-[10px] font-black uppercase tracking-wider text-on-surface-variant">
+                  <th class="px-4 py-3 w-10">№</th>
+                  <th class="px-3 py-3 w-36">Этап</th>
+                  <th class="px-3 py-3">Описание</th>
+                  <th class="px-4 py-3 w-44">Материалы / инструмент</th>
+                </tr>
+              </thead>
+              <tbody id="tech-tbody"></tbody>
+            </table>
+          </div>
+          <div class="px-4 py-2 bg-surface-container-low/50 text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5 lg:hidden">
+            <span class="material-symbols-outlined" style="font-size:13px">swipe_right</span>
+            Листайте вправо для полной информации
+          </div>
+        </div>
+      </section>
+
+      <!-- Технадзор -->
+      <section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+        <button onclick="toggleSection('ctrl-body')" class="w-full bg-tertiary-container px-4 py-4 flex items-center gap-3 text-left">
+          <span class="material-symbols-outlined text-white">fact_check</span>
+          <h3 id="ctrl-title" class="text-white font-extrabold text-sm uppercase tracking-wider flex-1">Технадзор: контроль качества</h3>
+          <span id="ctrl-arrow" class="material-symbols-outlined text-white transition-transform duration-200" style="font-size:20px">expand_more</span>
+        </button>
+        <div id="ctrl-body" style="display:none">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs border-collapse" style="min-width:460px">
+              <thead>
+                <tr class="bg-surface-container-low text-[10px] font-black uppercase tracking-wider text-on-surface-variant">
+                  <th class="px-4 py-3 w-24">Этап</th>
+                  <th class="px-3 py-3 w-40">Что проверять</th>
+                  <th class="px-3 py-3 w-36">Норма</th>
+                  <th class="px-4 py-3">Как / чем проверить</th>
+                </tr>
+              </thead>
+              <tbody id="ctrl-tbody"></tbody>
+            </table>
+          </div>
+          <div class="px-4 py-2 bg-blue-50 text-[11px] font-bold text-blue-600 flex items-center gap-1.5 lg:hidden">
+            <span class="material-symbols-outlined text-blue-500" style="font-size:13px">swipe_right</span>
+            Листайте вправо для полной информации
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<script>
+if (window.location.search.indexOf('embed=1') !== -1) {
+  var _h = document.querySelector('header');
+  if (_h) _h.style.display = 'none';
+  var _s = document.createElement('style');
+  _s.textContent = '.col-left{top:8px!important}';
+  document.head.appendChild(_s);
+}
+var serviceType = 'laminat';
+var kvType = 'zamok';
+var linoType = 'svobod';
+var inzhType = 'zamok';
+var plitaType = 'fanera';
+var platDiag = false;
+
+var ALL_SVCS = ['laminat','kvartsvinil','linoleum','keramogranit','parket','inzh_doska','drev_plity','epoxi'];
+var epoxiKvarsOn = false;
+
+var SERVICES = {
+  laminat:      { sub:'Ламинат' },
+  kvartsvinil:  { sub:'Кварцвинил (ПВХ)' },
+  linoleum:     { sub:'Линолеум' },
+  keramogranit: { sub:'Керамогранит' },
+  parket:       { sub:'Паркет штучный' },
+  inzh_doska:   { sub:'Инженерная доска' },
+  drev_plity:   { sub:'Древесные плиты' },
+  epoxi:        { sub:'Эпоксидный (полимерный) пол' }
+};
+
+var P = {
+  laminat_m2:       850,
+  podlozhka_m2:      65,
+  kvartsvinil_m2:  1200,
+  linoleum_m2:      520,
+  klej_pvkh_5kg:    480,
+  keramogranit_m2: 1600,
+  klej_plit_25kg:   650,
+  zatirka_2kg:      280,
+  krestiki_pak:      80,
+  ugolok_2m:        120,
+  parket_m2:       3500,
+  klej_park_17kg:  1800,
+  lak_2_5l:        1400,
+  shpatl_1kg:       180,
+  inzh_doska_m2:   2800,
+  klej_inzh_14kg:  1600,
+  fanera_list:     1800,
+  osb_list:        1100,
+  csp_list:        1350,
+  samorez_pak:      180,
+  plintus_2m:       200,
+  epoxi_10kg:      9800,
+  epoxi_primer_5kg:3600,
+  kvarts_25kg:      680
+};
+
+function toggleSection(id) {
+  var body = document.getElementById(id);
+  var arrow = document.getElementById(id.replace('-body','-arrow'));
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function setService(t) {
+  serviceType = t;
+  ALL_SVCS.forEach(function(k) {
+    var btn = document.getElementById('svc-' + k);
+    var label = btn.querySelector('span:last-child');
+    if (k === t) {
+      btn.classList.add('border-primary-container','bg-red-50');
+      btn.classList.remove('border-surface-container-high','bg-surface-container-lowest');
+      label.classList.add('text-primary'); label.classList.remove('text-on-surface-variant');
+    } else {
+      btn.classList.remove('border-primary-container','bg-red-50');
+      btn.classList.add('border-surface-container-high','bg-surface-container-lowest');
+      label.classList.remove('text-primary'); label.classList.add('text-on-surface-variant');
+    }
+  });
+  document.getElementById('header-sub').textContent = SERVICES[t].sub;
+  document.getElementById('sec-kv-type').style.display    = (t==='kvartsvinil') ? '' : 'none';
+  document.getElementById('sec-lino-type').style.display  = (t==='linoleum')    ? '' : 'none';
+  document.getElementById('sec-plat-diag').style.display  = (t==='keramogranit')? '' : 'none';
+  document.getElementById('sec-inzh-type').style.display  = (t==='inzh_doska')  ? '' : 'none';
+  document.getElementById('sec-plita-type').style.display = (t==='drev_plity')  ? '' : 'none';
+  document.getElementById('sec-epoxi').style.display      = (t==='epoxi')       ? '' : 'none';
+  document.getElementById('results').style.display = 'none';
+  var techKey = t;
+  if (t==='kvartsvinil') techKey = 'kvartsvinil_' + kvType;
+  if (t==='inzh_doska')  techKey = 'inzh_doska_'  + inzhType;
+  renderInfoTables(techKey);
+}
+
+function setKvType(v) {
+  kvType = v;
+  var bz = document.getElementById('btn-kv-zamok'), bk = document.getElementById('btn-kv-klej');
+  if (v==='zamok') {
+    bz.className = bz.className.replace('text-on-surface-variant',''); bz.classList.add('bg-primary-container','text-white','shadow-sm');
+    bk.classList.remove('bg-primary-container','text-white','shadow-sm'); bk.classList.add('text-on-surface-variant');
+    document.getElementById('kv-hint').textContent = 'Подложка + замковое соединение · без клея · быстрый монтаж';
+  } else {
+    bk.classList.add('bg-primary-container','text-white','shadow-sm'); bk.classList.remove('text-on-surface-variant');
+    bz.classList.remove('bg-primary-container','text-white','shadow-sm'); bz.classList.add('text-on-surface-variant');
+    document.getElementById('kv-hint').textContent = 'Клей на основание · максимальная фиксация · без пустот';
+  }
+  renderInfoTables('kvartsvinil_' + v);
+}
+
+function setLinoType(v) {
+  linoType = v;
+  var bs = document.getElementById('btn-lino-svobod'), bk = document.getElementById('btn-lino-klej');
+  if (v==='svobod') {
+    bs.classList.add('bg-primary-container','text-white','shadow-sm'); bs.classList.remove('text-on-surface-variant');
+    bk.classList.remove('bg-primary-container','text-white','shadow-sm'); bk.classList.add('text-on-surface-variant');
+    document.getElementById('lino-hint').textContent = 'Без фиксации · прижимается плинтусами и мебелью';
+  } else {
+    bk.classList.add('bg-primary-container','text-white','shadow-sm'); bk.classList.remove('text-on-surface-variant');
+    bs.classList.remove('bg-primary-container','text-white','shadow-sm'); bs.classList.add('text-on-surface-variant');
+    document.getElementById('lino-hint').textContent = 'Дисперсионный клей · надёжная фиксация · коммерческие помещения';
+  }
+}
+
+function setPlatDiag(v) {
+  platDiag = v;
+  var bp = document.getElementById('btn-pryam'), bd = document.getElementById('btn-diag');
+  if (!v) {
+    bp.classList.add('bg-primary-container','text-white','shadow-sm'); bp.classList.remove('text-on-surface-variant');
+    bd.classList.remove('bg-primary-container','text-white','shadow-sm'); bd.classList.add('text-on-surface-variant');
+    document.getElementById('diag-hint').textContent = 'Прямая укладка — стандарт · отходы +10%';
+  } else {
+    bd.classList.add('bg-primary-container','text-white','shadow-sm'); bd.classList.remove('text-on-surface-variant');
+    bp.classList.remove('bg-primary-container','text-white','shadow-sm'); bp.classList.add('text-on-surface-variant');
+    document.getElementById('diag-hint').textContent = 'Диагональная укладка — визуально расширяет пространство · отходы +15%';
+  }
+}
+
+function setInzhType(v) {
+  inzhType = v;
+  var bz = document.getElementById('btn-inzh-zamok'), bk = document.getElementById('btn-inzh-klej');
+  if (v==='zamok') {
+    bz.classList.add('bg-primary-container','text-white','shadow-sm'); bz.classList.remove('text-on-surface-variant');
+    bk.classList.remove('bg-primary-container','text-white','shadow-sm'); bk.classList.add('text-on-surface-variant');
+    document.getElementById('inzh-hint').textContent = 'Замковый — на подложку · плавающий монтаж';
+  } else {
+    bk.classList.add('bg-primary-container','text-white','shadow-sm'); bk.classList.remove('text-on-surface-variant');
+    bz.classList.remove('bg-primary-container','text-white','shadow-sm'); bz.classList.add('text-on-surface-variant');
+    document.getElementById('inzh-hint').textContent = 'На клей — жёсткая фиксация · рекомендуется на тёплый пол';
+  }
+  renderInfoTables('inzh_doska_' + v);
+}
+
+function setPlitaType(v) {
+  plitaType = v;
+  var hints = { fanera:'Фанера ФСФ 18 мм · 1525×1525 мм · влагостойкая', osb:'ОСБ-3 12 мм · 2500×1250 мм · ориентированно-стружечная', csp:'ЦСП 12 мм · 3200×1250 мм · цементно-стружечная · влаго- и огнестойкая' };
+  ['fanera','osb','csp'].forEach(function(k) {
+    var b = document.getElementById('btn-'+k);
+    if (k===v) { b.classList.add('bg-primary-container','text-white','shadow-sm'); b.classList.remove('text-on-surface-variant'); }
+    else { b.classList.remove('bg-primary-container','text-white','shadow-sm'); b.classList.add('text-on-surface-variant'); }
+  });
+  document.getElementById('plita-hint').textContent = hints[v];
+}
+
+function toggleEpoxiKvars() {
+  epoxiKvarsOn = !epoxiKvarsOn;
+  var btn  = document.getElementById('epoxi-kvars-field');
+  var box  = document.getElementById('epoxi-kvars-box');
+  var icon = document.getElementById('epoxi-kvars-icon');
+  var text = document.getElementById('epoxi-kvars-text');
+  if (epoxiKvarsOn) {
+    btn.classList.add('border-primary-container','bg-red-50'); btn.classList.remove('border-surface-container-high');
+    box.classList.add('bg-primary-container','border-primary-container'); box.classList.remove('border-outline');
+    icon.style.display='inline-block'; text.classList.add('text-primary'); text.classList.remove('text-on-surface-variant');
+  } else {
+    btn.classList.remove('border-primary-container','bg-red-50'); btn.classList.add('border-surface-container-high');
+    box.classList.remove('bg-primary-container','border-primary-container'); box.classList.add('border-outline');
+    icon.style.display='none'; text.classList.remove('text-primary'); text.classList.add('text-on-surface-variant');
+  }
+}
+
+function updateArea() {
+  var d = parseFloat(document.getElementById('dlina').value)||0;
+  var s = parseFloat(document.getElementById('shirina').value)||0;
+  document.getElementById('area-badge').textContent = (d*s)>0 ? (d*s).toFixed(2)+' м²' : '— м²';
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('ru-RU'); }
+
+function mkCard(label, value, unit, hl, sub) {
+  return '<div style="background:#fff;border-radius:12px;border-left:4px solid '+(hl?'#c0001a':'#e8e8ea')+';padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.04);display:flex;flex-direction:column;gap:8px;min-height:96px">' +
+    '<p style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#5c3f3d;line-height:1.3">'+label+'</p>' +
+    '<div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:24px;font-weight:800;color:'+(hl?'#c0001a':'#1a1c1d')+';line-height:1">'+value+'</span><span style="font-size:12px;font-weight:700;color:#5c3f3d">'+unit+'</span></div>' +
+    (sub?'<p style="font-size:10px;color:#916f6c;line-height:1.4">'+sub+'</p>':'')+'</div>';
+}
+
+function addRow(rows, total, name, qty, unit, price, sum) {
+  total[0] += sum;
+  var bg = rows.length%2===0?'#ffffff':'#f9f9fb';
+  rows.push('<tr style="background:'+bg+'"><td class="px-4 py-3 font-medium">'+name+'</td><td class="px-3 py-3 text-right text-on-surface-variant">'+fmt(qty)+'</td><td class="px-3 py-3 text-on-surface-variant">'+unit+'</td><td class="px-3 py-3 text-right text-on-surface-variant">'+fmt(price)+' ₽</td><td class="px-4 py-3 text-right font-bold">'+fmt(sum)+' ₽</td></tr>');
+}
+
+function renderResults(cards, rows, matTotal, rabota, S, summary) {
+  document.getElementById('cards-grid').innerHTML = cards.join('');
+  document.getElementById('price-tbody').innerHTML = rows.join('');
+  document.getElementById('price-tfoot').innerHTML =
+    '<tr style="background:#f3f3f5"><td class="px-4 py-3 text-on-surface-variant font-black uppercase" style="font-size:11px;letter-spacing:0.06em" colspan="4">Итого материалы</td><td class="px-4 py-3 text-right font-bold">'+fmt(matTotal)+' ₽</td></tr>'+
+    '<tr style="background:#fff0f2"><td class="px-4 py-3 text-primary font-black uppercase" style="font-size:11px;letter-spacing:0.06em" colspan="4">Работа ('+fmt(rabota/S)+' ₽/м² × '+S.toFixed(1)+' м²)</td><td class="px-4 py-3 text-right font-bold text-primary">'+fmt(rabota)+' ₽</td></tr>'+
+    '<tr style="background:#c0001a"><td class="px-4 py-4 font-black uppercase text-white" style="font-size:13px;letter-spacing:0.08em" colspan="4">ИТОГО</td><td class="px-4 py-4 text-right font-black text-white" style="font-size:18px">'+fmt(matTotal+rabota)+' ₽</td></tr>';
+  document.getElementById('summary-bar').innerHTML = summary;
+  document.getElementById('results').style.display = 'block';
+  var dlV = document.getElementById('dlina').value, shV = document.getElementById('shirina').value;
+  document.getElementById('print-title').textContent = 'Смета: ' + SERVICES[serviceType].sub;
+  document.getElementById('print-sub').textContent   = 'Помещение: '+dlV+' × '+shV+' м, площадь '+S.toFixed(1)+' м²';
+  var now = new Date(), months=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  document.getElementById('print-date').textContent = now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+  setTimeout(function(){ document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+}
+
+function calculate() {
+  var d = parseFloat(document.getElementById('dlina').value),
+      s = parseFloat(document.getElementById('shirina').value);
+  if (!d||!s||d<=0||s<=0) { alert('Введите длину и ширину помещения'); return; }
+  var S = d*s, perim = 2*(d+s);
+  var fns = { laminat:calcLaminat, kvartsvinil:calcKvartsvinil, linoleum:calcLinoleum,
+    keramogranit:calcKeramogranit, parket:calcParket, inzh_doska:calcInzhDoska, drev_plity:calcDrevPlity, epoxi:calcEpoxi };
+  fns[serviceType](S, perim);
+}
+
+function plintusShts(perim) { return Math.ceil(perim * 1.1 / 2); }
+
+function calcLaminat(S, perim) {
+  var lam = Math.ceil(S*1.1), pod = Math.ceil(S*1.1), pl = plintusShts(perim);
+  var cards = [
+    mkCard('Ламинат', lam, 'м²', true, '+10% на отходы'),
+    mkCard('Подложка', pod, 'м²', false, 'под ламинат'),
+    mkCard('Плинтус', pl, 'шт', false, 'плинтус 2 м')
+  ];
+  var rows=[], total=[0];
+  addRow(rows,total,'Ламинат 33 класс',lam,'м²',P.laminat_m2,lam*P.laminat_m2);
+  addRow(rows,total,'Подложка под ламинат, м²',pod,'м²',P.podlozhka_m2,pod*P.podlozhka_m2);
+  addRow(rows,total,'Плинтус ПВХ 2 м',pl,'шт',P.plintus_2m,pl*P.plintus_2m);
+  renderResults(cards,rows,total[0],S*500,S,'Площадь: <b>'+S.toFixed(2)+' м²</b> · Отходы: <b>+10%</b> · Ламинат: <b>'+lam+' м²</b>');
+}
+
+function calcKvartsvinil(S, perim) {
+  var pl = plintusShts(perim);
+  var cards=[], rows=[], total=[0], rabota;
+  if (kvType==='zamok') {
+    var kv = Math.ceil(S*1.1), pod = Math.ceil(S*1.1);
+    rabota = S*400;
+    cards.push(mkCard('Кварцвинил замок', kv, 'м²', true, '+10% на отходы'));
+    cards.push(mkCard('Подложка', pod, 'м²', false, 'под кварцвинил'));
+    cards.push(mkCard('Плинтус', pl, 'шт', false, 'плинтус 2 м'));
+    addRow(rows,total,'Кварцвинил замковый',kv,'м²',P.kvartsvinil_m2,kv*P.kvartsvinil_m2);
+    addRow(rows,total,'Подложка, м²',pod,'м²',P.podlozhka_m2,pod*P.podlozhka_m2);
+    addRow(rows,total,'Плинтус ПВХ 2 м',pl,'шт',P.plintus_2m,pl*P.plintus_2m);
+  } else {
+    var kv = Math.ceil(S*1.05), klejKg = parseFloat((S*0.5).toFixed(1)), klejPack = Math.ceil(klejKg/5);
+    rabota = S*600;
+    cards.push(mkCard('Кварцвинил клей', kv, 'м²', true, '+5% на подрезку'));
+    cards.push(mkCard('Клей для ПВХ', klejKg, 'кг', false, klejPack+' уп. × 5 кг'));
+    cards.push(mkCard('Плинтус', pl, 'шт', false, 'плинтус 2 м'));
+    addRow(rows,total,'Кварцвинил клеевой',kv,'м²',P.kvartsvinil_m2,kv*P.kvartsvinil_m2);
+    addRow(rows,total,'Клей для ПВХ, уп. 5 кг',klejPack,'уп.',P.klej_pvkh_5kg,klejPack*P.klej_pvkh_5kg);
+    addRow(rows,total,'Плинтус ПВХ 2 м',pl,'шт',P.plintus_2m,pl*P.plintus_2m);
+  }
+  renderResults(cards,rows,total[0],rabota,S,'Площадь: <b>'+S.toFixed(2)+' м²</b> · Способ: <b>'+(kvType==='zamok'?'Замковый':'На клей')+'</b>');
+}
+
+function calcLinoleum(S, perim) {
+  var pl = plintusShts(perim);
+  var cards=[], rows=[], total=[0], rabota;
+  if (linoType==='svobod') {
+    var lino = Math.ceil(S*1.1);
+    rabota = S*280;
+    cards.push(mkCard('Линолеум', lino, 'м²', true, '+10% на подрезку'));
+    cards.push(mkCard('Плинтус', pl, 'шт', false, 'плинтус 2 м'));
+    addRow(rows,total,'Линолеум бытовой',lino,'м²',P.linoleum_m2,lino*P.linoleum_m2);
+    addRow(rows,total,'Плинтус ПВХ 2 м',pl,'шт',P.plintus_2m,pl*P.plintus_2m);
+  } else {
+    var lino = Math.ceil(S*1.07), klejKg = parseFloat((S*0.35).toFixed(1)), klejPack = Math.ceil(klejKg/5);
+    rabota = S*380;
+    cards.push(mkCard('Линолеум', lino, 'м²', true, '+7% на подрезку'));
+    cards.push(mkCard('Клей дисперсионный', klejKg, 'кг', false, klejPack+' уп. × 5 кг'));
+    cards.push(mkCard('Плинтус', pl, 'шт', false, 'плинтус 2 м'));
+    addRow(rows,total,'Линолеум бытовой',lino,'м²',P.linoleum_m2,lino*P.linoleum_m2);
+    addRow(rows,total,'Клей дисперсионный, уп. 5 кг',klejPack,'уп.',P.klej_pvkh_5kg,klejPack*P.klej_pvkh_5kg);
+    addRow(rows,total,'Плинтус ПВХ 2 м',pl,'шт',P.plintus_2m,pl*P.plintus_2m);
+  }
+  renderResults(cards,rows,total[0],rabota,S,'Площадь: <b>'+S.toFixed(2)+' м²</b> · Способ: <b>'+(linoType==='svobod'?'Свободная укладка':'На клей')+'</b>');
+}
+
+function calcKeramogranit(S, perim) {
+  var waste = platDiag ? 0.15 : 0.10;
+  var plitka = Math.ceil(S*(1+waste));
+  var klejKg = parseFloat((S*5.5).toFixed(1)), klejMesh = Math.ceil(klejKg/25);
+  var zatirkaKg = parseFloat((S*0.5).toFixed(1)), zatirkaPack = Math.ceil(zatirkaKg/2);
+  var krestikiPack = Math.ceil(S*12/200);
+  var ugolok = Math.ceil(perim*1.1/2);
+  var rabota = S * (platDiag ? 1700 : 1500);
+  var cards = [
+    mkCard('Керамогранит', plitka, 'м²', true, '+'+(waste*100)+'% отходы'),
+    mkCard('Плиточный клей', klejMesh, 'меш.', false, fmt(Math.round(klejKg))+' кг · мешки 25 кг'),
+    mkCard('Затирка', zatirkaPack, 'уп.', false, 'упаковка 2 кг'),
+    mkCard('Крестики 2 мм', krestikiPack, 'уп.', false, 'уп. 200 шт'),
+    mkCard('Уголок ПВХ', ugolok, 'шт', false, 'профиль 2 м')
+  ];
+  var rows=[], total=[0];
+  addRow(rows,total,'Керамогранит',plitka,'м²',P.keramogranit_m2,plitka*P.keramogranit_m2);
+  addRow(rows,total,'Плиточный клей Кнауф/Церезит, мешок 25 кг',klejMesh,'меш.',P.klej_plit_25kg,klejMesh*P.klej_plit_25kg);
+  addRow(rows,total,'Затирка для швов, уп. 2 кг',zatirkaPack,'уп.',P.zatirka_2kg,zatirkaPack*P.zatirka_2kg);
+  addRow(rows,total,'Крестики дистанционные 2 мм, уп. 200 шт',krestikiPack,'уп.',P.krestiki_pak,krestikiPack*P.krestiki_pak);
+  addRow(rows,total,'Уголок ПВХ 2 м',ugolok,'шт',P.ugolok_2m,ugolok*P.ugolok_2m);
+  renderResults(cards,rows,total[0],rabota,S,'Площадь: <b>'+S.toFixed(2)+' м²</b> · Укладка: <b>'+(platDiag?'Диагональ':'Прямая')+'</b> · Отходы: <b>'+(waste*100)+'%</b>');
+}
+
+function calcParket(S, perim) {
+  var park = Math.ceil(S*1.15);
+  var klejKg = parseFloat((S*1.6).toFixed(1)), klejMesh = Math.ceil(klejKg/17);
+  var screwPak = Math.ceil(S*12/200);
+  var lakL = parseFloat((S*0.12*3).toFixed(1)), lak25l = Math.ceil(lakL/2.5);
+  var shpatlKg = Math.max(1, Math.ceil(S*0.05));
+  var pl = plintusShts(perim);
+  var cards = [
+    mkCard('Паркет штучный', park, 'м²', true, '+15% на подрезку'),
+    mkCard('Паркетный клей', klejMesh, 'ёмк.', false, fmt(Math.round(klejKg))+' кг · ёмкость 17 кг'),
+    mkCard('Лак паркетный', lak25l, 'уп.', false, '3 слоя · уп. 2.5 л'),
+    mkCard('Шпатлёвка по дереву', shpatlKg, 'кг', false, 'заполнение щелей'),
+    mkCard('Плинтус', pl, 'шт', false, 'плинтус 2 м')
+  ];
+  var rows=[], total=[0];
+  addRow(rows,total,'Паркет штучный',park,'м²',P.parket_m2,park*P.parket_m2);
+  addRow(rows,total,'Клей паркетный, ёмкость 17 кг',klejMesh,'ёмк.',P.klej_park_17kg,klejMesh*P.klej_park_17kg);
+  addRow(rows,total,'Саморезы 45 мм для паркета, уп. 200 шт',screwPak,'уп.',P.samorez_pak,screwPak*P.samorez_pak);
+  addRow(rows,total,'Лак паркетный, уп. 2.5 л',lak25l,'уп.',P.lak_2_5l,lak25l*P.lak_2_5l);
+  addRow(rows,total,'Шпатлёвка по дереву, кг',shpatlKg,'кг',P.shpatl_1kg,shpatlKg*P.shpatl_1kg);
+  addRow(rows,total,'Плинтус ПВХ 2 м',pl,'шт',P.plintus_2m,pl*P.plintus_2m);
+  renderResults(cards,rows,total[0],S*2000,S,'Площадь: <b>'+S.toFixed(2)+' м²</b> · Паркет: <b>'+park+' м²</b> · В работу включены: шлифовка + лакировка (3 слоя)');
+}
+
+function calcInzhDoska(S, perim) {
+  var doska = Math.ceil(S*1.1), pl = plintusShts(perim);
+  var cards=[], rows=[], total=[0], rabota;
+  if (inzhType==='zamok') {
+    var pod = Math.ceil(S*1.1);
+    rabota = S*1200;
+    cards.push(mkCard('Инженерная доска', doska, 'м²', true, '+10% на подрезку'));
+    cards.push(mkCard('Подложка', pod, 'м²', false, 'под замковую доску'));
+    cards.push(mkCard('Плинтус', pl, 'шт', false, 'плинтус 2 м'));
+    addRow(rows,total,'Инженерная доска',doska,'м²',P.inzh_doska_m2,doska*P.inzh_doska_m2);
+    addRow(rows,total,'Подложка, м²',pod,'м²',P.podlozhka_m2,pod*P.podlozhka_m2);
+    addRow(rows,total,'Плинтус ПВХ 2 м',pl,'шт',P.plintus_2m,pl*P.plintus_2m);
+  } else {
+    var klejKg = parseFloat((S*1.3).toFixed(1)), klejMesh = Math.ceil(klejKg/14);
+    rabota = S*1400;
+    cards.push(mkCard('Инженерная доска', doska, 'м²', true, '+10% на подрезку'));
+    cards.push(mkCard('Клей для инж. доски', klejMesh, 'ёмк.', false, fmt(Math.round(klejKg))+' кг · ёмкость 14 кг'));
+    cards.push(mkCard('Плинтус', pl, 'шт', false, 'плинтус 2 м'));
+    addRow(rows,total,'Инженерная доска',doska,'м²',P.inzh_doska_m2,doska*P.inzh_doska_m2);
+    addRow(rows,total,'Клей для инженерной доски, ёмкость 14 кг',klejMesh,'ёмк.',P.klej_inzh_14kg,klejMesh*P.klej_inzh_14kg);
+    addRow(rows,total,'Плинтус ПВХ 2 м',pl,'шт',P.plintus_2m,pl*P.plintus_2m);
+  }
+  renderResults(cards,rows,total[0],rabota,S,'Площадь: <b>'+S.toFixed(2)+' м²</b> · Способ: <b>'+(inzhType==='zamok'?'Замковый':'На клей')+'</b>');
+}
+
+function calcDrevPlity(S, perim) {
+  var configs = {
+    fanera: { name:'Фанера ФСФ 18 мм 1525×1525', listM2:2.32, price:P.fanera_list, label:'Фанера 18 мм' },
+    osb:    { name:'ОСБ-3 12 мм 2500×1250',      listM2:3.125, price:P.osb_list,   label:'ОСБ-3 12 мм' },
+    csp:    { name:'ЦСП 12 мм 3200×1250',         listM2:4.0,  price:P.csp_list,   label:'ЦСП 12 мм'   }
+  };
+  var c = configs[plitaType];
+  var listov = Math.ceil(S*1.05 / c.listM2);
+  var samorezPak = Math.ceil(S*10/200);
+  var cards = [
+    mkCard(c.label, listov, 'листов', true, c.listM2.toFixed(2)+' м²/лист · S='+fmt(Math.round(S*1.05))+' м²'),
+    mkCard('Саморезы', samorezPak, 'уп.', false, '10 шт/м² · уп. 200 шт')
+  ];
+  var rows=[], total=[0];
+  addRow(rows,total,c.name,listov,'лист',c.price,listov*c.price);
+  addRow(rows,total,'Саморезы 4.2×75 мм, уп. 200 шт',samorezPak,'уп.',P.samorez_pak,samorezPak*P.samorez_pak);
+  renderResults(cards,rows,total[0],S*450,S,'Площадь: <b>'+S.toFixed(2)+' м²</b> · Тип: <b>'+c.label+'</b> · Листов: <b>'+listov+' шт</b>');
+}
+
+function calcEpoxi(S, perim) {
+  var thick = parseInt(document.getElementById('epoxi-thick').value);
+  var smesKg    = parseFloat((S * 1.5 * thick * 1.05).toFixed(1));
+  var smesPacks = Math.ceil(smesKg / 10);
+  var primerKg  = parseFloat((S * 0.3).toFixed(1));
+  var primerPacks = Math.ceil(primerKg / 5);
+  var rabotaRate = thick <= 2 ? 1800 : thick <= 3 ? 2200 : 2800;
+  var cards = [
+    mkCard('Эпоксидная смесь 2К', smesPacks, 'компл.', true, fmt(Math.round(smesKg))+' кг · комплект 10 кг · '+thick+' мм'),
+    mkCard('Эпоксидный праймер', primerPacks, 'ёмк.', false, fmt(Math.round(primerKg))+' кг · ёмкость 5 кг')
+  ];
+  var rows=[], total=[0];
+  addRow(rows,total,'Эпоксидная смесь 2К, комплект 10 кг',smesPacks,'компл.',P.epoxi_10kg,smesPacks*P.epoxi_10kg);
+  addRow(rows,total,'Эпоксидный грунт-праймер 2К, ёмкость 5 кг',primerPacks,'ёмк.',P.epoxi_primer_5kg,primerPacks*P.epoxi_primer_5kg);
+  if (epoxiKvarsOn) {
+    var kvartsKg  = parseFloat((S * 3).toFixed(1));
+    var kvartsMesh = Math.ceil(kvartsKg / 25);
+    cards.push(mkCard('Кварцевый наполнитель', kvartsMesh, 'меш.', false, fmt(Math.round(kvartsKg))+' кг · мешки 25 кг'));
+    addRow(rows,total,'Кварцевый песок фракция 0.3–0.6 мм, мешок 25 кг',kvartsMesh,'меш.',P.kvarts_25kg,kvartsMesh*P.kvarts_25kg);
+  }
+  var kvarsStr = epoxiKvarsOn ? ' · Наполнитель: <b>кварцевый песок</b>' : '';
+  renderResults(cards,rows,total[0],S*rabotaRate,S,'Площадь: <b>'+S.toFixed(2)+' м²</b> · Толщина: <b>'+thick+' мм</b> · Смеси: <b>'+fmt(Math.round(smesKg))+' кг ('+smesPacks+' компл.)</b>'+kvarsStr);
+}
+
+/* ===== ТЕХНОЛОГИЯ И ТЕХНАДЗОР ===== */
+var TECH_DATA = {
+  laminat: { title:'Технология: укладка ламината', steps:[
+    ['Подготовка основания','Основание должно быть ровным (просвет ≤ 2 мм/2 м), сухим (влажность ≤ 5%), прочным. Неровности зашлифовать или зашпаклевать. Убрать мусор.','Правило 2 м, влагомер, шлифмашина'],
+    ['Акклиматизация','Выдержать ламинат в помещении 48 ч при T° +18…+22°C и влажности 50–60%. Не распаковывать до укладки. Это предотвращает деформацию после монтажа.','Термометр, гигрометр'],
+    ['Укладка подложки','Раскатать подложку встык (не внахлёст). Стыки проклеить скотчем. Подложка компенсирует небольшие неровности и снижает шум.','Подложка, скотч, нож'],
+    ['Первый ряд','Уложить первый ряд гребнем к стене. Установить распорные клинья 8–10 мм от стены по всему периметру — зазор для теплового расширения.','Клинья 8–10 мм, угольник'],
+    ['Сборка замков','Панели следующего ряда смещать на 40–50 см относительно предыдущего. Замок защёлкивать под углом 30–45° или добивать через брусок. Не допускать зазоров в швах.','Брусок, киянка, лобзик'],
+    ['Последний ряд','Подрезать по ширине с учётом зазора 8–10 мм. Использовать монтажный крючок для прижима к предыдущему ряду.','Лобзик/дисковая пила, монтажный крюк'],
+    ['Установка плинтусов','Убрать клинья. Установить плинтус с зазором — он перекрывает тепловой шов, но не прижимает ламинат к полу. Крепить к стене, не к полу.','Плинтус ПВХ, ножницы, дюбели']
+  ]},
+  kvartsvinil_zamok: { title:'Технология: кварцвинил замковый', steps:[
+    ['Подготовка основания','Основание ровное (≤ 1 мм/2 м), сухое (≤ 5%), без пыли. Неровности устранить самовыравнивающей смесью. Кварцвинил не маскирует неровности основания.','Правило 2 м, влагомер, наливной пол'],
+    ['Акклиматизация','Выдержать упаковки горизонтально 24–48 ч при T° +18…+29°C. Рабочая температура монтажа: +15…+35°C.','Термометр'],
+    ['Укладка подложки','Подложка 1.5–2 мм из вспененного PE или пробки. Укладывать встык без нахлёста. Стыки проклеить скотчем.','Подложка, скотч'],
+    ['Разметка направления','Определить направление укладки (обычно вдоль длинной стены или по свету). Центровка помещения для симметричного вида.','Рулетка, меловая нить'],
+    ['Укладка замковым соединением','Панели укладывать со смещением 1/3 длины. Замок защёлкивать под углом ~30°. Зазор от стены: 5–8 мм (кварцвинил расширяется меньше дерева).','Нож, угольник, клинья 5–8 мм'],
+    ['Установка плинтусов','Убрать клинья. Плинтус крепить к стене, не фиксировать покрытие к полу — плавающий монтаж.','Плинтус, дюбели, ножницы']
+  ]},
+  kvartsvinil_klej: { title:'Технология: кварцвинил на клей', steps:[
+    ['Подготовка основания','Основание: ровное (≤ 0.5 мм/2 м), сухое (≤ 3%), прочное. Это критично: клеевой кварцвинил копирует малейшие неровности. Зашлифовать выступы, заделать впадины.','Правило, шлифмашина, самовыравнивающая смесь'],
+    ['Грунтование','Нанести грунтовку или праймер для улучшения адгезии. Сушка 2–4 ч. Особенно важно на стяжке.','Грунтовка, валик'],
+    ['Акклиматизация','24–48 ч в помещении при рабочей температуре. Разложить плитки не в стопке — они должны принять форму при данной T°.','Термометр'],
+    ['Разметка от центра','Найти центр помещения, разметить оси. Первую плитку укладывать от центра — так раскладка будет симметричной.','Рулетка, угольник, меловая нить'],
+    ['Нанесение клея и укладка','Нанести клей зубчатым шпателем на основание (не на плитку). Уложить плитку, прижать роликом или тяжёлым валиком. Клеевой шов: 0.5–1 мм.','Зубчатый шпатель, прикаточный ролик'],
+    ['Выдержка и плинтуса','Не ходить по покрытию 24 ч (дать клею схватиться). Затем установить плинтуса.','Плинтус, дюбели']
+  ]},
+  linoleum: { title:'Технология: укладка линолеума', steps:[
+    ['Подготовка основания','Ровное (≤ 2 мм/2 м), сухое, без мусора. Перепады более 2 мм сгладить шпаклёвкой. Линолеум тонкий — он повторяет любые неровности.','Правило 2 м, шпаклёвка'],
+    ['Акклиматизация','Раскатать рулон в тёплом помещении (+15°C и выше) на 24–48 ч. Холодный линолеум ломается при разрезании.','Термометр'],
+    ['Раскрой','Отрезать с припуском 5–7 см на каждую сторону. Дать полотну «осесть» — выровняться по форме помещения. При стыковке: нахлёст 2–3 см.','Нож, металлическая линейка'],
+    ['Укладка (свободная)','Разложить по полу, подогнуть края у стен и подрезать ровно. Прижать плинтусами со всех сторон. При площади > 20 м² обязательна фиксация по периметру.','Нож, угольник'],
+    ['Укладка на клей','Свернуть полотно пополам. Нанести клей зубчатым шпателем на половину основания. Раскатать линолеум, прижать роликом. Повторить с другой половиной.','Клей, зубчатый шпатель, прикаточный ролик'],
+    ['Сварка стыков (при необходимости)','При наличии стыков — холодная сварка специальным составом. Нанести по стыку, подождать 5 мин, убрать излишки. Стык становится монолитным.','Холодная сварка для линолеума'],
+    ['Установка плинтусов','Плинтус крепить к стене. Не прибивать линолеум к полу — он должен иметь возможность незначительно двигаться.','Плинтус, дюбели']
+  ]},
+  keramogranit: { title:'Технология: укладка керамогранита', steps:[
+    ['Подготовка основания','Стяжка прочная (≥ М150), ровная (≤ 4 мм/2 м под плитку), влажность ≤ 5%. Загрунтовать глубокой грунтовкой — снижает водопоглощение и улучшает адгезию клея.','Правило 2 м, влагомер, грунтовка'],
+    ['Разметка раскладки','Найти центр помещения. Разложить плитку насухо для проверки раскладки — крайние плитки не должны быть уже половины. Разметить оси меловой нитью.','Рулетка, меловая нить, угольник'],
+    ['Приготовление клея','Засыпать смесь в воду (не наоборот). Перемешать миксером 3–5 мин. Пауза 3 мин, снова перемешать. Открытое время — 20–30 мин. Не добавлять воду после схватывания.','Дрель-миксер, ёмкость ≥ 20 л'],
+    ['Укладка плитки','Нанести клей на основание зубчатым шпателем 6–8 мм. Для крупного формата — дополнительно на плитку. Укладывать с крестиками 2 мм. Простукивать резиновым молотком.','Зубчатый шпатель 8 мм, резиновый молоток'],
+    ['Контроль горизонтали','Каждую плитку проверять уровнем. Использовать систему выравнивания плитки (СВП) при формате > 600×600 мм для предотвращения перепадов между плитками.','Уровень 1–2 м, СВП (клипсы + клинья)'],
+    ['Затирка','Через 24–48 ч после укладки. Смочить швы водой. Нанести затирку резиновым шпателем по диагонали к швам. Убрать излишки влажной губкой. Полировать через 15–20 мин.','Резиновый шпатель, губка, вода'],
+    ['Защита покрытия','Керамогранит с полированной или матовой поверхностью обработать пропиткой-гидрофобизатором — защищает от загрязнений в швах.','Пропитка для керамогранита, губка']
+  ]},
+  parket: { title:'Технология: укладка штучного паркета', steps:[
+    ['Акклиматизация','Паркет выдержать в помещении 5–7 суток при T° +18…+22°C и влажности 45–60%. Не складировать у наружных стен. Это критично: паркет — живой материал.','Термометр, гигрометр'],
+    ['Подготовка основания','Фанера 18 мм на саморезах (шаг 15–20 см). Стыки фанеры смещены. Зазоры между листами 3–4 мм (тепловой шов). Фанера шлифуется до ровной плоскости ≤ 2 мм/2 м.','Дисковая пила, шуруповёрт, шлифмашина'],
+    ['Нанесение паркетного клея','Клей нанести зубчатым шпателем на фанеру. Площадь нанесения — не более того, что можно уложить за 30–40 мин (открытое время клея).','Паркетный клей, зубчатый шпатель'],
+    ['Укладка паркета','Первый ряд от стены с зазором 10–15 мм. Укладывать вразбежку. Каждую дощечку фиксировать: прижать к клею и сразу закрепить дюбель-гвоздём или скрытым шурупом через шип.','Паркетный гвоздезабиватель или шуруповёрт'],
+    ['Первичная шлифовка','Через 3–5 суток (после полного схватывания клея). Шлифовать вдоль волокна. Первый проход — зерно P40, финишный — P80–100. Убрать пыль пылесосом.','Барабанная шлифмашина, Р40–Р100'],
+    ['Шпатлёвка','Заполнить щели и царапины шпатлёвкой по дереву подходящего цвета. После высыхания — финишная шлифовка P100–120.','Шпатлёвка, шпатель, шлифмашина P100–120'],
+    ['Лакировка','Нанести 3 слоя лака. Первый слой — разведённый (грунтовочный). Между слоями — шлифовка P180–220 и уборка пыли. Не ходить между слоями минимум 4–6 ч.','Лак паркетный, валик, P180–220']
+  ]},
+  inzh_doska_zamok: { title:'Технология: инженерная доска замковая', steps:[
+    ['Подготовка основания','Ровное (≤ 2 мм/2 м), сухое (≤ 5%), прочное. Инженерная доска толще ламината, но основание всё равно должно быть подготовлено.','Правило 2 м, влагомер'],
+    ['Акклиматизация','48–72 ч в помещении в горизонтальных стопках при T° +18…+22°C, влажность 45–65%.','Термометр, гигрометр'],
+    ['Укладка подложки','Подложка 1.5–3 мм. Встык, без нахлёста, стыки скотчем.','Подложка, скотч'],
+    ['Укладка от стены','Первый ряд: паз к стене, зазор 10 мм. Использовать клинья. Доски смещать минимум на 40 см от ряда к ряду.','Клинья, киянка, брусок'],
+    ['Защёлкивание замков','Замок кратко описывает: "click" — угол 30–45°, нажать вниз. Не применять чрезмерных усилий. Подбивать через защитный брусок.','Брусок, киянка, монтажный крюк'],
+    ['Установка плинтусов','Убрать клинья, установить плинтус к стене. Зазор перекрывается плинтусом.','Плинтус, дюбели']
+  ]},
+  inzh_doska_klej: { title:'Технология: инженерная доска на клей', steps:[
+    ['Подготовка основания','Ровное (≤ 1 мм/2 м), сухое (≤ 3.5%), прочное. Основание — стяжка или фанера 18 мм. На клею доска работает "в жёсткой связи" с основанием — неровности передаются.','Правило 2 м, влагомер, шлифмашина'],
+    ['Акклиматизация','5–7 суток при T° +18…+22°C, влажность 45–65%. Инженерная доска на клею должна полностью адаптироваться к влажности помещения до укладки.','Термометр, гигрометр'],
+    ['Нанесение клея','Эластичный паркетный клей нанести зубчатым шпателем. Площадь нанесения — 3–5 м² за раз (открытое время 40–60 мин). Равномерный слой без пропусков.','Эластичный клей, зубчатый шпатель'],
+    ['Укладка досок','Укладывать вразбежку со смещением ≥ 40 см. Первый ряд — от стены с зазором 10 мм (компенсационный). Прижимать к клею тяжёлыми предметами.','Груз, клинья 10 мм'],
+    ['Выдержка','Полное схватывание клея: 24–48 ч. Не ходить и не нагружать покрытие. T° помещения +18°C и выше.','Тяжёлые предметы для прижима'],
+    ['Установка плинтусов','После отверждения клея установить плинтус к стене. Зазор 10 мм у стены обязателен.','Плинтус, дюбели']
+  ]},
+  drev_plity: { title:'Технология: укладка древесных плит', steps:[
+    ['Подготовка основания','Стяжка или деревянные лаги — ровные, прочные, сухие. Влажность бетона ≤ 5%, дерева ≤ 12%. На бетон — обязательная гидроизоляция (плёнка 200 мкм или обмазочная).','Влагомер, плёнка п/э'],
+    ['Гидроизоляция','Плёнку 200 мкм уложить с нахлёстом 150–200 мм и заходом на стены 5–7 см. Стыки проклеить скотчем. Особенно важно для фанеры и ОСБ.','Плёнка п/э 200 мкм, скотч'],
+    ['Разметка раскладки','Раскладку листов сделать вразбежку — швы не должны совпадать (как кирпичная кладка). Это обеспечивает жёсткость основания.','Рулетка, карандаш'],
+    ['Раскрой листов','Оставить зазоры: от стены 8–10 мм, между листами 3–4 мм (тепловые швы). Плиты пилить с подрезкой под коммуникации.','Дисковая/циркулярная пила, лобзик'],
+    ['Крепление саморезами','Крепить по периметру листа с шагом 150–200 мм, в поле — 200–250 мм. Шурупы утапливать заподлицо или с небольшим заглублением. Для ОСБ/ЦСП — клей ПВА дополнительно.','Шуруповёрт, саморезы 4.2×75 мм'],
+    ['Шлифовка стыков','Стыки листов зашлифовать, чтобы не было перепадов (особенно под тонкое покрытие: линолеум, кварцвинил). Норма: ≤ 1 мм на стыке.','Угловая шлифмашина, ленточная шлифмашина']
+  ]}
+};
+
+var CTRL_DATA = {
+  laminat: { title:'Технадзор: ламинат', rows:[
+    ['До начала','Ровность основания','≤ 2 мм/2 м','Правило 2 м + клинья'],
+    ['До начала','Влажность основания','≤ 5%','Влагомер или плёнка на 24 ч'],
+    ['До начала','Акклиматизация','48 ч в помещении','Время + термометр'],
+    ['Подложка','Нахлёст / встык','Встык, стыки проклеены','Визуально'],
+    ['Укладка','Зазор от стен','8–10 мм по всему периметру','Клинья, рулетка'],
+    ['Укладка','Смещение рядов','≥ 40–50 см','Рулетка'],
+    ['Укладка','Плотность замков','Нет щелей в стыках','Визуально, освещение снизу'],
+    ['Плинтус','Крепление','К стене, не к полу','Визуально — ламинат движется'],
+    ['Итог','Скрипы и прогибы','Нет при ходьбе','Нагрузка + прослушивание']
+  ]},
+  kvartsvinil_zamok: { title:'Технадзор: кварцвинил замковый', rows:[
+    ['До начала','Ровность основания','≤ 1 мм/2 м (кварцвинил тонкий!)','Правило 2 м + клинья'],
+    ['До начала','Влажность основания','≤ 5%','Влагомер'],
+    ['До начала','Акклиматизация','24–48 ч при +15…+35°C','Термометр'],
+    ['Укладка','Зазор от стен','5–8 мм','Клинья, рулетка'],
+    ['Укладка','Смещение рядов','≥ 1/3 длины панели','Рулетка'],
+    ['Укладка','Плотность замков','Нет зазоров, нет поднятых краёв','Визуально'],
+    ['Итог','Плоскостность','Нет бугров, нет "провалов"','Правило 2 м'],
+    ['Итог','Скрипы','Нет при ходьбе','Нагрузка']
+  ]},
+  kvartsvinil_klej: { title:'Технадзор: кварцвинил клеевой', rows:[
+    ['До начала','Ровность основания','≤ 0.5 мм/2 м','Правило 2 м + клинья'],
+    ['До начала','Влажность основания','≤ 3%','Влагомер CM'],
+    ['Грунтование','Высыхание грунта','Не липнет к ладони','Тест ладонью'],
+    ['Укладка','Нанесение клея','Без пропусков, равномерный слой','Визуально'],
+    ['Укладка','Прижим плитки','Прокатать роликом после укладки','Прикаточный ролик'],
+    ['24 ч','Адгезия','Не отклеивается при подцепе шпателем','Шпатель'],
+    ['Итог','Ровность','Нет поднятых краёв и пузырей','Визуально']
+  ]},
+  linoleum: { title:'Технадзор: линолеум', rows:[
+    ['До начала','Ровность основания','≤ 2 мм/2 м','Правило 2 м'],
+    ['До начала','Влажность основания','≤ 5%','Влагомер или плёнка на 24 ч'],
+    ['До начала','Акклиматизация','24–48 ч в тёплом помещении','T° > +15°C'],
+    ['Раскрой','Линии реза','Ровные, без зазубрин','Металлическая линейка + нож'],
+    ['Укладка','Воздушные пузыри','Нет пузырей — выгнать вальком','Прикаточный валик'],
+    ['Стыки','Холодная сварка','Нет видимого шва после высыхания','Визуально при косом свете'],
+    ['Плинтус','Прижим краёв','Все края плотно прижаты','Визуально']
+  ]},
+  keramogranit: { title:'Технадзор: керамогранит', rows:[
+    ['До начала','Прочность стяжки','≥ М150, не крошится','Простукивание, склерометр'],
+    ['До начала','Ровность стяжки','≤ 4 мм/2 м','Правило 2 м + клинья'],
+    ['До начала','Влажность стяжки','≤ 5%','Влагомер CM'],
+    ['Клей','Консистенция','Держится на вертикальном шпателе','Шпатель — тест "не сползает"'],
+    ['Укладка','Перепады плоскости','≤ 1 мм на стыке плиток','СВП (клипсы + клинья)'],
+    ['Укладка','Ширина шва','Одинаковая по всему полу','Крестики одного размера'],
+    ['24 ч','Адгезия','Не двигается при нажатии','Нажать, прослушать (нет "пустоты")'],
+    ['Затирка','Заполнение швов','Нет пустот в шве','Визуально + освещение'],
+    ['Итог','Ровность','≤ 4 мм/2 м','Правило 2 м + клинья']
+  ]},
+  parket: { title:'Технадзор: паркет штучный', rows:[
+    ['До начала','Влажность фанеры','≤ 8%','Влагомер'],
+    ['До начала','Ровность фанеры','≤ 2 мм/2 м','Правило 2 м'],
+    ['До начала','Акклиматизация паркета','5–7 суток при 45–60% влажности','Гигрометр + время'],
+    ['Клей','Равномерность нанесения','Без пропусков, гребень шпателя','Визуально'],
+    ['Укладка','Зазор от стен','10–15 мм','Клинья, рулетка'],
+    ['Укладка','Смещение рядов','Вразбежку, нет крестовых швов','Визуально'],
+    ['Шлифовка','Ровность поверхности','≤ 1 мм/2 м после шлифовки','Правило 2 м'],
+    ['Лакировка','Количество слоёв','Минимум 3 слоя','Счёт нанесений'],
+    ['Итог','Скрипы','Нет при ходьбе','Нагрузка + прослушивание']
+  ]},
+  inzh_doska_zamok: { title:'Технадзор: инженерная доска замковая', rows:[
+    ['До начала','Ровность основания','≤ 2 мм/2 м','Правило 2 м + клинья'],
+    ['До начала','Влажность основания','≤ 5%','Влагомер'],
+    ['До начала','Акклиматизация','48–72 ч при 45–65% влажности','Гигрометр'],
+    ['Укладка','Зазор от стен','10 мм','Клинья'],
+    ['Укладка','Замки','Нет щелей, нет поднятых кромок','Визуально, освещение снизу'],
+    ['Итог','Скрипы и прогибы','Нет при ходьбе','Нагрузка']
+  ]},
+  inzh_doska_klej: { title:'Технадзор: инженерная доска на клей', rows:[
+    ['До начала','Ровность основания','≤ 1 мм/2 м','Правило 2 м + клинья'],
+    ['До начала','Влажность основания','≤ 3.5%','Влагомер CM'],
+    ['До начала','Акклиматизация','5–7 суток при 45–65%','Гигрометр'],
+    ['Клей','Открытое время','Не превышать 40–60 мин','Время'],
+    ['Укладка','Прижим','Тяжёлые предметы 24–48 ч','Груз'],
+    ['48 ч','Адгезия','Не отходит при подцепе','Шпатель у края'],
+    ['Итог','Скрипы','Нет при ходьбе','Нагрузка']
+  ]},
+  drev_plity: { title:'Технадзор: древесные плиты', rows:[
+    ['До начала','Влажность основания','Бетон ≤ 5%, дерево ≤ 12%','Влагомер'],
+    ['Гидроизоляция','Нахлёст и целостность','≥ 150 мм, нет разрывов','Визуально, рулетка'],
+    ['Раскладка','Разбежка швов','Швы не совпадают (≥ 400 мм)','Рулетка'],
+    ['Раскрой','Зазоры','От стены 8–10 мм, между листами 3–4 мм','Клинья, рулетка'],
+    ['Крепление','Шаг саморезов','150–200 мм по периметру','Рулетка'],
+    ['Крепление','Заглубление шляпок','Заподлицо или с заглублением','Визуально, правило'],
+    ['Итог','Перепады стыков','≤ 1 мм на стыке листов','Правило 2 м + клинья'],
+    ['Итог','Прогибы и скрипы','Нет при ходьбе','Нагрузка']
+  ]}
+};
+
+TECH_DATA.epoxi = { title:'Технология: эпоксидный (полимерный) пол', steps:[
+  ['Подготовка основания','Стяжка прочная (≥ М200 для промышленных, ≥ М150 для коммерческих), сухая (≤ 4% для эпоксида!), без пыли и масляных пятен. Масляные пятна — снять болгаркой с алмазной чашей. Трещины — разделать и заполнить ремсоставом.','УШМ с алмазной чашей, ремсостав, пылесос'],
+  ['Шлифовка основания','Отшлифовать поверхность алмазной чашей или шлифмашиной — вскрыть "молочко" бетона, создать шероховатость. Убрать всю пыль пылесосом. Без этого адгезия будет недостаточной.','Шлифмашина, алмазные чаши, промышленный пылесос'],
+  ['Контроль влажности','Проверить влажность бетона влагомером (≤ 4%). Альтернатива: приклеить плёнку 1×1 м скотчем на 24 ч — конденсат недопустим. Работа при влажности > 4% приводит к отслоению.','Влагомер CM, плёнка п/э'],
+  ['Нанесение праймера','Эпоксидный праймер 2К смешать согласно инструкции (компонент А + компонент Б), перемешать миксером 3–5 мин. Нанести валиком или кистью равномерно без пропусков. Сушка 12–24 ч.','Дрель-миксер, валик с коротким ворсом, кисть'],
+  ['Приготовление основного состава','Смешать компоненты А и Б строго по пропорции (обычно 2:1 или 3:1 по весу). Перемешать миксером 5 мин. Добавить при необходимости пигмент. Рабочее время: 30–50 мин при +20°C — не превышать.','Дрель-миксер, весы, ёмкость 30+ л'],
+  ['Нанесение базового слоя','Вылить смесь на пол и распределить зубчатым ракелем или шпателем до нужной толщины. При использовании кварцевого наполнителя — сразу после нанесения посыпать равномерно из лейки.','Зубчатый ракель, шпатель-ракель'],
+  ['Аэрация игольчатым валиком','Сразу (в течение 10–15 мин) прокатать игольчатым валиком — удалить пузыри воздуха. Движение крест-накрест. Критично для ровной поверхности без кратеров.','Игольчатый валик, антишиповые бахилы'],
+  ['Финишный слой (при необходимости)','Для покрытий 3+ мм: после отверждения базового слоя (24–48 ч) нанести финишный прозрачный или цветной слой. Шлифовать зерном P180 перед финишем.','Эпоксидный финиш-лак, валик'],
+  ['Выдержка','Лёгкая ходьба — через 24 ч. Полная нагрузка (мебель, технологическое оборудование) — через 7 суток. T° во время отверждения: не ниже +15°C.','Плёнка для защиты от пыли, ограждение']
+]};
+
+CTRL_DATA.epoxi = { title:'Технадзор: эпоксидный пол', rows:[
+  ['До начала','Прочность стяжки','≥ М150 (ком.), ≥ М200 (пром.)','Молоток, склерометр'],
+  ['До начала','Влажность стяжки','≤ 4% — критично для эпоксида','Влагомер CM (обязательно)'],
+  ['До начала','Ровность основания','≤ 4 мм/2 м','Правило 2 м + клинья'],
+  ['До начала','Масляные пятна','Отсутствуют','Визуально, тест водой (вода не собирается в капли)'],
+  ['Шлифовка','Вскрытие "молочка"','Шероховатая матовая поверхность','Визуально, провести рукой'],
+  ['Праймер','Равномерность, отсутствие пропусков','Нет блестящих непропитанных зон','Визуально'],
+  ['Праймер','Высыхание','Не липнет, но ещё слегка тёплый','Тест пальцем (12–24 ч)'],
+  ['Смесь','Пропорция компонентов','По весу согласно инструкции','Весы — обязательно'],
+  ['Нанесение','Толщина слоя','В пределах проектной ±0.3 мм','Игла-щуп'],
+  ['Нанесение','Аэрация','Нет пузырей и кратеров через 30 мин','Визуально'],
+  ['24 ч','Адгезия','Не отходит при подцепе шпателем','Шпатель у края'],
+  ['7 суток','Прочность','Не царапается ключом, звонкий звук','Монета, ключ']
+]};
+
+function renderInfoTables(key) {
+  var tech = TECH_DATA[key], ctrl = CTRL_DATA[key];
+  if (!tech || !ctrl) return;
+  document.getElementById('tech-title').textContent = tech.title;
+  document.getElementById('tech-tbody').innerHTML = tech.steps.map(function(s,i){
+    var bg = i%2===0?'#ffffff':'#f9f9fb';
+    return '<tr style="background:'+bg+';border-bottom:1px solid #eeeef0">'+
+      '<td style="padding:14px 16px;font-size:16px;font-weight:900;color:#c0001a;vertical-align:top;white-space:nowrap">'+String(i+1).padStart(2,'0')+'</td>'+
+      '<td style="padding:14px 12px;font-weight:700;vertical-align:top;line-height:1.4">'+s[0]+'</td>'+
+      '<td style="padding:14px 12px;color:#5c3f3d;font-size:13px;vertical-align:top;line-height:1.5">'+s[1]+'</td>'+
+      '<td style="padding:14px 16px;color:#916f6c;font-style:italic;font-size:13px;vertical-align:top;line-height:1.4">'+s[2]+'</td></tr>';
+  }).join('');
+  document.getElementById('ctrl-title').textContent = ctrl.title;
+  document.getElementById('ctrl-tbody').innerHTML = ctrl.rows.map(function(r,i){
+    var bg = i%2===0?'#ffffff':'#f9f9fb';
+    return '<tr style="background:'+bg+';border-bottom:1px solid #eeeef0">'+
+      '<td style="padding:12px 16px;font-weight:700">'+r[0]+'</td>'+
+      '<td style="padding:12px 12px">'+r[1]+'</td>'+
+      '<td style="padding:12px 12px;font-weight:600;color:#1a1c1d">'+r[2]+'</td>'+
+      '<td style="padding:12px 16px;font-style:italic;color:#5c3f3d">'+r[3]+'</td></tr>';
+  }).join('');
+}
+
+renderInfoTables('laminat');
+</script>
+</body>
+</html>
