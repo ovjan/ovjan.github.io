@@ -195,12 +195,11 @@
   .vc-ctrl-norm { font-size: 13px; color: #333; margin-bottom: 3px; }
   .vc-ctrl-how { font-size: 12px; color: #888; font-style: italic; }
   .vc-price-cards { padding: 8px 16px 4px; }
-  .vc-price-card { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f3f3f3; }
+  .vc-price-card { padding: 12px 0; border-bottom: 1px solid #f3f3f3; }
   .vc-price-card:last-child { border-bottom: none; }
-  .vc-price-name { font-size: 13px; color: #333; flex: 1; line-height: 1.4; }
-  .vc-price-right { text-align: right; flex-shrink: 0; }
-  .vc-price-qty { font-size: 11px; color: #aaa; }
-  .vc-price-sum { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .vc-price-name { font-size: 14px; font-weight: 600; color: #1a1a2e; line-height: 1.4; margin-bottom: 4px; }
+  .vc-price-details { font-size: 12px; color: #999; margin-bottom: 3px; }
+  .vc-price-sum { font-size: 15px; font-weight: 800; color: #c0001a; }
   .vc-price-footer { padding: 4px 16px 16px; }
   .vc-price-row { display: flex; justify-content: space-between; padding: 9px 0; border-top: 1px solid #eee; font-size: 13px; }
   .vc-price-row .vc-pf-label { color: #555; }
@@ -587,7 +586,7 @@ function renderResults(cards, rows, matTotal, rabota, S, summary) {
 
 function addRow(rows, total, name, qty, unit, price, sum) {
   total[0] += sum;
-  rows.push('<div class="vc-price-card"><div class="vc-price-name">' + name + '</div><div class="vc-price-right"><div class="vc-price-qty">' + fmt(qty) + ' ' + unit + ' × ' + fmt(price) + ' ₽</div><div class="vc-price-sum">' + fmt(sum) + ' ₽</div></div></div>');
+  rows.push('<div class="vc-price-card"><div class="vc-price-name">' + name + '</div><div class="vc-price-details">' + fmt(qty) + ' ' + unit + ' × ' + fmt(price) + ' ₽</div><div class="vc-price-sum">' + fmt(sum) + ' ₽</div></div>');
 }
 
 function calculate() {
