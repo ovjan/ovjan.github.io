@@ -583,8 +583,7 @@ function mkCard(label, value, unit, hl, sub) {
 
 function addRow(rows, total, name, qty, unit, price, sum) {
   total[0] += sum;
-  var bg = rows.length%2===0?'#ffffff':'#f9f9fb';
-  rows.push('<tr style="background:'+bg+'"><td class="px-4 py-3 font-medium">'+name+'</td><td class="px-3 py-3 text-right text-on-surface-variant">'+fmt(qty)+'</td><td class="px-3 py-3 text-on-surface-variant">'+unit+'</td><td class="px-3 py-3 text-right text-on-surface-variant">'+fmt(price)+' ₽</td><td class="px-4 py-3 text-right font-bold">'+fmt(sum)+' ₽</td></tr>');
+  rows.push('<div class="vc-price-card"><div class="vc-price-name">' + name + '</div><div class="vc-price-details">' + fmt(qty) + ' ' + unit + ' × ' + fmt(price) + ' ₽</div><div class="vc-price-sum">' + fmt(sum) + ' ₽</div></div>');
 }
 
 function renderResults(cards, rows, matTotal, rabota, S, summary) {
