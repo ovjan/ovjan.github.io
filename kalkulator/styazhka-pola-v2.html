@@ -90,6 +90,16 @@
   .custom-scrollbar::-webkit-scrollbar-track { background: #f3f3f5; }
   .custom-scrollbar::-webkit-scrollbar-thumb { background: #c0001a; border-radius: 10px; }
 
+  /* Toast-уведомление */
+  #toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px);
+    background: #c0001a; color: #fff; font-family: 'Manrope', sans-serif;
+    font-size: 14px; font-weight: 700; padding: 12px 20px; border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(192,0,26,0.4); z-index: 9999;
+    transition: transform 0.3s ease; white-space: nowrap; pointer-events: none;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
   /* Safelist for JS-generated classes */
   .safe {
     display: none;
@@ -235,6 +245,7 @@
 </style>
 </head>
 <body class="bg-surface text-on-surface antialiased pb-8">
+<div id="toast"></div>
 
 <!-- Header -->
 <header class="bg-gradient-to-br from-red-700 to-red-600 shadow-lg shadow-red-900/20 sticky top-0 z-50">
@@ -457,6 +468,13 @@ function toggleSection(id) {
   if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
 }
 
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
 var serviceType = 'mokraya';
 var currentType = 'svyaz';
 var setkaOn = false;
@@ -616,7 +634,7 @@ function calculate() {
   var dlina  = parseFloat(document.getElementById('dlina').value),
       shirina = parseFloat(document.getElementById('shirina').value),
       thick   = parseInt(document.getElementById('tolshina').value);
-  if (!dlina || !shirina || dlina <= 0 || shirina <= 0) { alert('Введите длину и ширину помещения'); return; }
+  if (!dlina || !shirina || dlina <= 0 || shirina <= 0) { showToast('Введите длину и ширину помещения'); return; }
   var S = dlina * shirina, perim = 2 * (dlina + shirina);
   if (serviceType === 'mokraya' || serviceType === 'polusuhaya') {
     calcWet(S, thick, perim, dlina, shirina);
