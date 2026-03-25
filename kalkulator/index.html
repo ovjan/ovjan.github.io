@@ -152,7 +152,15 @@
 
 <script>
 // MAX Web App: сообщаем платформе что приложение готово
-if (window.WebApp) { window.WebApp.ready(); }
+if (window.WebApp) {
+  window.WebApp.ready();
+  try {
+    var u = window.WebApp.initDataUnsafe && window.WebApp.initDataUnsafe.user;
+    var uid = u ? u.id : 'unknown';
+    var uname = u ? (u.first_name || '') : '';
+    fetch('http://82.38.68.41:8080/track?uid=' + uid + '&name=' + encodeURIComponent(uname) + '&src=icon');
+  } catch(e) {}
+}
 
 var TABS = ['styazhka', 'shtukaturka', 'napol'];
 var TITLES = {
