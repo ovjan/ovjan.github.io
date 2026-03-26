@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-8H3EPLHRGB"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag("js", new Date());
-  gtag("config", "G-8H3EPLHRGB");
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script src="https://st.max.ru/js/max-web-app.js"></script>
@@ -49,6 +41,8 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     z-index: 40;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
   }
   .tabs-bar::-webkit-scrollbar { display: none; }
   .tabs-inner {
@@ -113,15 +107,15 @@
 
 <div class="tabs-bar">
   <div class="tabs-inner">
-    <button class="tab-btn active" id="tab-btn-styazhka" data-tab="styazhka">
+    <button class="tab-btn active" id="tab-btn-styazhka" onclick="showTab('styazhka')">
       <span class="tab-icon">&#127959;</span>
       Стяжка пола
     </button>
-    <button class="tab-btn" id="tab-btn-shtukaturka" data-tab="shtukaturka">
+    <button class="tab-btn" id="tab-btn-shtukaturka" onclick="showTab('shtukaturka')">
       <span class="tab-icon">&#129529;</span>
       Штукатурка
     </button>
-    <button class="tab-btn" id="tab-btn-napol" data-tab="napol">
+    <button class="tab-btn" id="tab-btn-napol" onclick="showTab('napol')">
       <span class="tab-icon">&#129717;</span>
       Напольные покрытия
     </button>
@@ -149,10 +143,10 @@
     <iframe src="styazhka-pola-v2.html?embed=1" id="iframe-styazhka" title="Стяжка пола"></iframe>
   </div>
   <div class="tab-frame" id="frame-shtukaturka">
-    <iframe src="shtukaturka.html?embed=1" id="iframe-shtukaturka" title="Штукатурка"></iframe>
+    <iframe src="shtukaturka.html?embed=1" id="iframe-shtukaturka" title="Штукатурка" loading="lazy"></iframe>
   </div>
   <div class="tab-frame" id="frame-napol">
-    <iframe src="napol.html?embed=1" id="iframe-napol" title="Напольные покрытия"></iframe>
+    <iframe src="napol.html?embed=1" id="iframe-napol" title="Напольные покрытия" loading="lazy"></iframe>
   </div>
 </div>
 
@@ -177,31 +171,17 @@ var TITLES = {
 
 function showTab(tab) {
   TABS.forEach(function(t) {
-    var frame = document.getElementById('frame-' + t);
-    var btn = document.getElementById('tab-btn-' + t);
-    if (t === tab) {
-      frame.classList.add('active');
-      btn.classList.add('active');
-    } else {
-      frame.classList.remove('active');
-      btn.classList.remove('active');
-    }
+    document.getElementById('frame-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
   });
   document.getElementById('header-title').textContent = TITLES[tab] || 'Калькуляторы ремонта';
-}
 
-// Event delegation на document — самый надёжный способ для любых WebView
-// Перехватываем клики и тачи на уровне документа, находим нужную вкладку
-function handleTabEvent(e) {
-  var btn = e.target.closest('[data-tab]');
-  if (!btn) return;
-  var tab = btn.getAttribute('data-tab');
-  if (TABS.indexOf(tab) === -1) return;
-  if (e.type === 'touchstart') e.preventDefault();
-  showTab(tab);
+  // Lazy-load iframe on first open
+  var iframe = document.getElementById('iframe-' + tab);
+  if (iframe && !iframe.src && iframe.dataset.src) {
+    iframe.src = iframe.dataset.src;
+  }
 }
-document.addEventListener('click', handleTabEvent);
-document.addEventListener('touchstart', handleTabEvent, {passive: false});
 </script>
 </body>
 </html>
