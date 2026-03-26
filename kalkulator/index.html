@@ -181,7 +181,12 @@ function showTab(tab) {
   if (iframe && !iframe.src && iframe.dataset.src) {
     iframe.src = iframe.dataset.src;
   }
+
+  // DEBUG: показывает что функция вызвалась
+  var dbg = document.getElementById('_debug');
+  if (dbg) dbg.textContent = '✓ showTab: ' + tab;
 }
 </script>
+<div id="_debug" style="position:fixed;bottom:0;left:0;right:0;background:#c0001a;color:#fff;text-align:center;font-size:16px;font-weight:700;padding:8px;z-index:99999;pointer-events:none;">нажми на вкладку</div>
 </body>
 </html>
