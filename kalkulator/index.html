@@ -113,15 +113,15 @@
 
 <div class="tabs-bar">
   <div class="tabs-inner">
-    <button class="tab-btn active" id="tab-btn-styazhka" onclick="showTab('styazhka')">
+    <button class="tab-btn active" id="tab-btn-styazhka" data-tab="styazhka">
       <span class="tab-icon">&#127959;</span>
       Стяжка пола
     </button>
-    <button class="tab-btn" id="tab-btn-shtukaturka" onclick="showTab('shtukaturka')">
+    <button class="tab-btn" id="tab-btn-shtukaturka" data-tab="shtukaturka">
       <span class="tab-icon">&#129529;</span>
       Штукатурка
     </button>
-    <button class="tab-btn" id="tab-btn-napol" onclick="showTab('napol')">
+    <button class="tab-btn" id="tab-btn-napol" data-tab="napol">
       <span class="tab-icon">&#129717;</span>
       Напольные покрытия
     </button>
@@ -190,14 +190,18 @@ function showTab(tab) {
   document.getElementById('header-title').textContent = TITLES[tab] || 'Калькуляторы ремонта';
 }
 
-// touchstart для мгновенного срабатывания в MAX WebApp WebView
-TABS.forEach(function(tab) {
-  var btn = document.getElementById('tab-btn-' + tab);
-  btn.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    showTab(tab);
-  }, {passive: false});
-});
+// Event delegation на document — самый надёжный способ для любых WebView
+// Перехватываем клики и тачи на уровне документа, находим нужную вкладку
+function handleTabEvent(e) {
+  var btn = e.target.closest('[data-tab]');
+  if (!btn) return;
+  var tab = btn.getAttribute('data-tab');
+  if (TABS.indexOf(tab) === -1) return;
+  if (e.type === 'touchstart') e.preventDefault();
+  showTab(tab);
+}
+document.addEventListener('click', handleTabEvent);
+document.addEventListener('touchstart', handleTabEvent, {passive: false});
 </script>
 </body>
 </html>
