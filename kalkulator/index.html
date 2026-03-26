@@ -188,6 +188,16 @@ function showTab(tab) {
     iframe.src = iframe.dataset.src;
   }
 }
+
+// touchend для надёжной работы в MAX WebApp WebView
+// (onclick в горизонтально-скроллируемом контейнере может не срабатывать)
+TABS.forEach(function(tab) {
+  var btn = document.getElementById('tab-btn-' + tab);
+  btn.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    showTab(tab);
+  }, {passive: false});
+});
 </script>
 </body>
 </html>
