@@ -149,10 +149,10 @@
     <iframe src="styazhka-pola-v2.html?embed=1" id="iframe-styazhka" title="Стяжка пола"></iframe>
   </div>
   <div class="tab-frame" id="frame-shtukaturka">
-    <iframe src="shtukaturka.html?embed=1" id="iframe-shtukaturka" title="Штукатурка" loading="lazy"></iframe>
+    <iframe src="shtukaturka.html?embed=1" id="iframe-shtukaturka" title="Штукатурка"></iframe>
   </div>
   <div class="tab-frame" id="frame-napol">
-    <iframe src="napol.html?embed=1" id="iframe-napol" title="Напольные покрытия" loading="lazy"></iframe>
+    <iframe src="napol.html?embed=1" id="iframe-napol" title="Напольные покрытия"></iframe>
   </div>
 </div>
 
@@ -177,23 +177,23 @@ var TITLES = {
 
 function showTab(tab) {
   TABS.forEach(function(t) {
-    document.getElementById('frame-' + t).classList.toggle('active', t === tab);
-    document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
+    var frame = document.getElementById('frame-' + t);
+    var btn = document.getElementById('tab-btn-' + t);
+    if (t === tab) {
+      frame.classList.add('active');
+      btn.classList.add('active');
+    } else {
+      frame.classList.remove('active');
+      btn.classList.remove('active');
+    }
   });
   document.getElementById('header-title').textContent = TITLES[tab] || 'Калькуляторы ремонта';
-
-  // Lazy-load iframe on first open
-  var iframe = document.getElementById('iframe-' + tab);
-  if (iframe && !iframe.src && iframe.dataset.src) {
-    iframe.src = iframe.dataset.src;
-  }
 }
 
-// touchend для надёжной работы в MAX WebApp WebView
-// (onclick в горизонтально-скроллируемом контейнере может не срабатывать)
+// touchstart для мгновенного срабатывания в MAX WebApp WebView
 TABS.forEach(function(tab) {
   var btn = document.getElementById('tab-btn-' + tab);
-  btn.addEventListener('touchend', function(e) {
+  btn.addEventListener('touchstart', function(e) {
     e.preventDefault();
     showTab(tab);
   }, {passive: false});
