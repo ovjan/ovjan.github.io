@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://st.max.ru/js/max-web-app.js"></script>
 <title>Калькуляторы ремонта</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -43,8 +43,6 @@
     scrollbar-width: none;
     position: relative;
     z-index: 100;
-    touch-action: pan-x;
-    overscroll-behavior-x: contain;
   }
   .tabs-bar::-webkit-scrollbar { display: none; }
   .tabs-inner {
@@ -157,10 +155,10 @@
 if (window.WebApp) {
   window.WebApp.ready();
   try {
-    var u = window.WebApp.initDataUnsafe && window.WebApp.initDataUnsafe.user;
-    var uid = u ? u.id : 'unknown';
-    var uname = u ? (u.first_name || '') : '';
-    fetch('http://82.38.68.41:8080/track?uid=' + uid + '&name=' + encodeURIComponent(uname) + '&src=icon');
+    var _waUser = window.WebApp.initDataUnsafe && window.WebApp.initDataUnsafe.user;
+    var _waUid = _waUser ? _waUser.id : 'unknown';
+    var _waName = _waUser ? (_waUser.first_name || '') : '';
+    fetch('http://82.38.68.41:8080/track?uid=' + _waUid + '&name=' + encodeURIComponent(_waName) + '&src=icon');
   } catch(e) {}
 }
 
@@ -185,6 +183,8 @@ function showTab(tab) {
   }
 
 }
+
+
 </script>
 </body>
 </html>
